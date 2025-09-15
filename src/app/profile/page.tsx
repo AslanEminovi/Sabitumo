@@ -65,9 +65,6 @@ interface UserAnalytics {
   yearlySpending: number
   favoriteProducts: number
   memberSince: string
-  loyaltyPoints: number
-  loyaltyTier: string
-  totalSavings: number
   spendingTrend: number
   topCategories: any[]
   monthlyTrends: any[]
@@ -118,9 +115,6 @@ export default function ProfilePage() {
     yearlySpending: 0,
     favoriteProducts: 0,
     memberSince: '',
-    loyaltyPoints: 0,
-    loyaltyTier: 'Bronze',
-    totalSavings: 0,
     spendingTrend: 0,
     topCategories: [],
     monthlyTrends: [],
@@ -190,15 +184,7 @@ export default function ProfilePage() {
         ? ((monthlySpending - lastMonthSpending) / lastMonthSpending) * 100 
         : 0
 
-      // Calculate loyalty metrics
-      const loyaltyPoints = Math.floor(totalSpent / 10) // 1 point per 10 GEL
-      const totalSavings = Math.floor(totalSpent * 0.05) // 5% savings estimation
-      
-      // Determine loyalty tier
-      let loyaltyTier = 'Bronze'
-      if (totalSpent >= 10000) loyaltyTier = 'Platinum'
-      else if (totalSpent >= 5000) loyaltyTier = 'Gold'
-      else if (totalSpent >= 1000) loyaltyTier = 'Silver'
+      // Real analytics only - no fake loyalty system
 
       // Calculate order frequency (orders per month since joining)
       const joinedDate = new Date(joinDate)
@@ -292,9 +278,6 @@ export default function ProfilePage() {
         yearlySpending,
         favoriteProducts: 0, // TODO: Implement favorites
         memberSince: joinDate,
-        loyaltyPoints,
-        loyaltyTier,
-        totalSavings,
         spendingTrend,
         topCategories,
         monthlyTrends,
@@ -526,9 +509,9 @@ export default function ProfilePage() {
                   </h2>
                   <p className="text-gray-600 mb-2">{profileData.email}</p>
                   <div className="flex items-center justify-center">
-                    <Award className="w-4 h-4 text-amber-500 mr-1" />
-                    <span className="text-amber-600 font-medium">
-                      {analytics.loyaltyTier} {locale === 'ka' ? 'წევრი' : 'Member'}
+                    <Award className="w-4 h-4 text-emerald-500 mr-1" />
+                    <span className="text-emerald-600 font-medium">
+                      {locale === 'ka' ? 'ვერიფიცირებული წევრი' : 'Verified Member'}
                     </span>
                   </div>
                   
@@ -591,15 +574,15 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                        <Star className="w-5 h-5 text-amber-600" />
+                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <Package className="w-5 h-5 text-emerald-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-amber-900">{analytics.loyaltyPoints}</p>
-                        <p className="text-xs text-amber-700">
-                          {locale === 'ka' ? 'ლოიალურობის ქულები' : 'Loyalty Points'}
+                        <p className="text-sm font-medium text-emerald-900">{analytics.totalOrders}</p>
+                        <p className="text-xs text-emerald-700">
+                          {locale === 'ka' ? 'მთლიანი შეკვეთები' : 'Total Orders'}
                         </p>
                       </div>
                     </div>
@@ -909,17 +892,17 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">
-                      {locale === 'ka' ? 'ეკონომია' : 'Total Savings'}
+                      {locale === 'ka' ? 'წევრობიდან' : 'Member Since'}
                     </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {analytics.totalSavings.toLocaleString()} ₾
+                    <p className="text-lg font-bold text-gray-900">
+                      {analytics.memberSince ? new Date(analytics.memberSince).toLocaleDateString() : 'N/A'}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {locale === 'ka' ? 'ლოიალურობისთვის' : 'from loyalty'}
+                      {locale === 'ka' ? 'რეგისტრაციის თარიღი' : 'Registration date'}
                     </p>
                   </div>
-                  <div className="p-3 bg-amber-50 rounded-full">
-                    <Award className="w-6 h-6 text-amber-600" />
+                  <div className="p-3 bg-blue-50 rounded-full">
+                    <Calendar className="w-6 h-6 text-blue-600" />
                   </div>
                 </div>
               </motion.div>
