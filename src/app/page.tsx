@@ -175,7 +175,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen relative">
       {/* Hero Section */}
-      <section className="relative py-8 sm:py-12 md:py-20 overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[500px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-t-3xl rounded-b-3xl">
+      <section className="relative py-8 sm:py-12 md:py-20 overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[500px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-t-3xl rounded-b-3xl mt-4">
         {/* Tactical Background Pattern */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white"></div>
@@ -547,18 +547,18 @@ export default function HomePage() {
                           </span>
                         </div>
                         
-                        {/* Brand Logo - Right Side - Fixed dimensions */}
-                        <div className="w-16 h-10 relative flex-shrink-0 flex items-center justify-end">
+                        {/* Brand Logo - Right Side - Bigger dimensions */}
+                        <div className="w-20 h-12 relative flex-shrink-0 flex items-center justify-end">
                           {product.brands?.logo ? (
                             <Image
                               src={product.brands.logo}
                               alt={product.brands.name}
                               fill
                               className="object-contain opacity-80"
-                              sizes="64px"
+                              sizes="80px"
                             />
                           ) : (
-                            <div className="w-16 h-10"></div>
+                            <div className="w-20 h-12"></div>
                           )}
                         </div>
                       </div>

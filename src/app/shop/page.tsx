@@ -712,7 +712,7 @@ function ShopPageContent() {
                                 
                                 {/* Brand Logo */}
                                 {product.brands?.logo && (
-                                  <div className="w-16 h-10 relative flex-shrink-0">
+                                  <div className="w-20 h-12 relative flex-shrink-0">
                                     <Image
                                       src={product.brands.logo}
                                       alt={product.brands.name}
