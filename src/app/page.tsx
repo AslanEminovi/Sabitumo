@@ -358,7 +358,7 @@ export default function HomePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {[...Array(5)].map((_, index) => (
                   <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-pulse">
-                    <div className="h-48 sm:h-56 md:h-64 lg:h-72 bg-gray-200"></div>
+                    <div className="h-56 sm:h-64 md:h-72 lg:h-80 xl:h-84 bg-gray-200"></div>
                     <div className="p-6">
                       <div className="h-4 bg-gray-200 rounded mb-2"></div>
                       <div className="h-6 bg-gray-200 rounded mb-4"></div>
@@ -389,7 +389,7 @@ export default function HomePage() {
                   >
                     {/* Enhanced Product Image with Navigation */}
                     <div 
-                      className="relative h-48 sm:h-56 md:h-64 lg:h-72 overflow-hidden cursor-pointer"
+                      className="relative h-56 sm:h-64 md:h-72 lg:h-80 xl:h-84 overflow-hidden cursor-pointer"
                       onClick={() => router.push(`/products/${product.sku || product.id}`)}
                     >
                       <div className="absolute inset-0 bg-white"></div>
@@ -519,7 +519,7 @@ export default function HomePage() {
                       </h3>
 
                       {/* Stock and Min Order Info */}
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-3 text-xs text-gray-500">
                           <div className="flex items-center">
                             <Package className="w-3 h-3 mr-1" />
@@ -535,11 +535,11 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Spacer to push price/brand to bottom */}
-                      <div className="flex-1"></div>
+                      {/* Reduced spacer */}
+                      <div className="flex-1 min-h-[0.5rem]"></div>
 
                       {/* Price and Brand Section - Fixed position at bottom */}
-                      <div className="flex items-center justify-between mt-auto">
+                      <div className="flex items-center justify-between">
                         {/* Price Container - Left Side */}
                         <div className="flex items-baseline space-x-1 bg-emerald-50 px-2 py-1 rounded-md">
                           <span className="text-lg sm:text-xl font-bold text-gray-900">
