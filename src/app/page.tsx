@@ -501,7 +501,7 @@ export default function HomePage() {
 
                     {/* Enhanced Product Info */}
                     <div 
-                      className="p-3 sm:p-4 cursor-pointer flex flex-col h-full"
+                      className="p-3 sm:p-4 cursor-pointer"
                       onClick={() => router.push(`/products/${product.sku || product.id}`)}
                     >
                       {/* Category Badge */}
@@ -535,7 +535,7 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Price and Brand Section - Fixed position at bottom */}
+                      {/* Price and Brand Section */}
                       <div className="flex items-center justify-between">
                         {/* Price Container - Left Side */}
                         <div className="flex items-baseline space-x-1 bg-emerald-50 px-2 py-1 rounded-md">
