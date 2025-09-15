@@ -550,7 +550,7 @@ export default function SettingsPage() {
                               {locale === 'ka' ? 'რეგისტრაციის თარიღი' : 'Registration Date'}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {new Date(profileData.created_at).toLocaleDateString()}
+                              {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                             </p>
                           </div>
                         </div>
