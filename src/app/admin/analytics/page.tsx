@@ -7,20 +7,12 @@ import { isAdmin } from '@/lib/admin'
 import { supabase } from '@/lib/supabase'
 import { motion } from 'framer-motion'
 import { 
-  TrendingUp, 
-  TrendingDown, 
   DollarSign, 
-  Package, 
   Users, 
   ShoppingCart,
-  Calendar,
-  Download,
   ArrowLeft,
-  BarChart3,
   RefreshCw,
-  Target,
-  Zap,
-  Award
+  Target
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -108,7 +100,7 @@ export default function AdminAnalytics() {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !(await isAdmin(user.id))) {
+      if (!user || !(await isAdmin())) {
         router.push('/auth/login')
         return
       }
@@ -116,7 +108,7 @@ export default function AdminAnalytics() {
       setLoading(false)
     }
     checkAuth()
-  }, [router, selectedPeriod])
+  }, [router, selectedPeriod, fetchAnalytics])
 
   const getDateRange = useCallback((period: string) => {
     const now = new Date()
@@ -212,9 +204,9 @@ export default function AdminAnalytics() {
         monthlyData[monthKey].orders += 1
       })
 
-      const salesByMonth = Object.entries(monthlyData)
+        const salesByMonth = Object.entries(monthlyData)
         .map(([monthKey, data]) => {
-          const [year, month] = monthKey.split('-')
+          const [, month] = monthKey.split('-')
           return {
             month: monthKey,
             monthName: getMonthName(parseInt(month) - 1),

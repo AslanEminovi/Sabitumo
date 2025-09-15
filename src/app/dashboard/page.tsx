@@ -7,24 +7,13 @@ import Link from 'next/link'
 import { 
   Package, 
   ShoppingCart, 
-  Heart, 
-  Bell, 
   User, 
-  Settings, 
-  Clock,
-  Star,
   TrendingUp,
-  TrendingDown,
-  ArrowRight,
-  CheckCircle,
-  Truck,
   RefreshCw,
   DollarSign,
-  Award,
   BarChart3,
   Target,
-  Zap,
-  X
+  Calendar
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
