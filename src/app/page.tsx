@@ -536,7 +536,7 @@ export default function HomePage() {
                       </div>
 
                       {/* Reduced spacer */}
-                      <div className="flex-1 min-h-[0.5rem]"></div>
+                      <div className="flex-1 min-h-[0.25rem]"></div>
 
                       {/* Price and Brand Section - Fixed position at bottom */}
                       <div className="flex items-center justify-between">

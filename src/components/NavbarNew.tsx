@@ -32,6 +32,7 @@ export function NavbarNew() {
   const [isBrandsDropdownOpen, setIsBrandsDropdownOpen] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   // Toggle functions
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
@@ -57,6 +58,17 @@ export function NavbarNew() {
     })
 
     return () => subscription.unsubscribe()
+  }, [])
+
+  // Handle scroll effect for translucent navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY
+      setIsScrolled(scrollTop > 50)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // Close dropdowns when clicking outside
@@ -97,7 +109,7 @@ export function NavbarNew() {
 
   return (
     <motion.nav 
-      className="glass-effect shadow-elegant border-b border-gray-200/50 sticky top-0 z-50 rounded-b-3xl w-full max-w-full"
+      className={`${isScrolled ? 'glass-effect-scrolled' : 'glass-effect'} shadow-elegant border-b border-gray-200/50 sticky top-0 z-50 rounded-b-3xl w-full max-w-full`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
@@ -115,7 +127,7 @@ export function NavbarNew() {
               <img 
                 src="/sabitumo1.png" 
                 alt="Sabitumo Logo" 
-                className="h-8 w-8 object-cover rounded-full border-2 border-gray-200 hover:border-emerald-300 transition-colors duration-150"
+                className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 hover:border-emerald-300 transition-colors duration-150"
               />
               <span className="hidden sm:block text-lg font-bold text-primary-900">Sabitumo</span>
             </Link>
