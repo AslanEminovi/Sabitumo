@@ -182,7 +182,7 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-6 flex items-baseline space-x-6">
+            <div className="ml-12 flex items-baseline space-x-8">
               {/* Home */}
               <motion.div variants={navItemVariants} initial="hidden" animate="visible" transition={{ delay: 0 * 0.1 }}>
                 <Link href="/" className="text-gray-700 hover:text-primary-900 px-3 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
@@ -216,7 +216,7 @@ export function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="ml-1"
                   >
-                    <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-amber-600 transition-colors" />
+                    <ChevronDown className="w-5 h-5 text-gray-700 group-hover:text-amber-600 transition-colors" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
