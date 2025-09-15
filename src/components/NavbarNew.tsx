@@ -97,13 +97,13 @@ export function NavbarNew() {
 
   return (
     <motion.nav 
-      className="glass-effect shadow-elegant border-b border-gray-200/50 sticky top-0 z-50 rounded-b-3xl"
+      className="glass-effect shadow-elegant border-b border-gray-200/50 sticky top-0 z-50 rounded-b-3xl w-full max-w-full overflow-hidden"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
     >
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16 w-full">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 w-full">
+        <div className="flex items-center justify-between h-16 w-full min-w-0">
           
           {/* Logo */}
           <motion.div 
@@ -201,13 +201,14 @@ export function NavbarNew() {
               <AnimatePresence>
                 {isLanguageDropdownOpen && (
                   <motion.div 
-                    className="absolute right-0 mt-3 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden min-w-48"
+                    className="absolute right-0 sm:right-0 mt-3 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden w-48 max-w-[90vw]"
+                    style={{ right: 'max(0px, min(0px, calc(100vw - 100% - 16px)))' }}
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="py-2">
+                    <div className="py-2 max-h-60 overflow-y-auto">
                       {languages.map((language) => (
                         <button
                           key={language.code}
@@ -215,14 +216,14 @@ export function NavbarNew() {
                             changeLocale(language.code as 'en' | 'ka')
                             setIsLanguageDropdownOpen(false)
                           }}
-                          className={`w-full flex items-center space-x-3 px-6 py-3 text-sm transition-all duration-200 ${
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-sm transition-all duration-200 ${
                             locale === language.code 
                               ? 'bg-amber-50 text-amber-700 border-r-2 border-amber-500' 
                               : 'text-gray-700 hover:bg-amber-50 hover:text-amber-700'
                           }`}
                         >
                           <span className="text-lg">{language.flag}</span>
-                          <span className="font-medium">{language.name}</span>
+                          <span className="font-medium truncate">{language.name}</span>
                         </button>
                       ))}
                     </div>
@@ -253,7 +254,7 @@ export function NavbarNew() {
               <AnimatePresence>
                 {user && isUserDropdownOpen && (
                   <motion.div 
-                    className="absolute right-0 mt-3 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden min-w-60"
+                    className="absolute right-0 mt-3 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden w-60 max-w-[90vw]"
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -352,13 +353,13 @@ export function NavbarNew() {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              className="md:hidden bg-white border-t border-gray-200"
+              className="md:hidden bg-white border-t border-gray-200 max-h-[70vh] overflow-y-auto"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="px-2 pt-2 pb-3 space-y-1">
+              <div className="px-2 pt-2 pb-3 space-y-1 w-full overflow-hidden">
                 <Link href="/" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50 rounded-md transition-all duration-200">
                   {t('navigation', 'home')}
                 </Link>
