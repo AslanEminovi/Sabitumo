@@ -231,12 +231,12 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-6 gap-4 justify-items-center items-center w-full">
+          <div className="grid grid-cols-6 gap-3 justify-items-center items-center w-full">
             {loading ? (
               // Loading skeleton
               [...Array(6)].map((_, index) => (
                 <div key={index} className="flex flex-col items-center p-2 animate-pulse">
-                  <div className="w-20 h-20 mb-2 bg-gray-200 rounded-lg"></div>
+                  <div className="w-24 h-24 mb-2 bg-gray-200 rounded-lg"></div>
                   <div className="h-3 w-12 mb-1 bg-gray-200 rounded"></div>
                   <div className="h-2 w-8 bg-gray-200 rounded"></div>
                 </div>
@@ -278,14 +278,14 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
                 <img
                   src={logoSrc}
                   alt={brand.name}
-                  className="w-20 h-20 object-contain"
+                  className="w-24 h-24 object-contain"
                   onError={(e) => {
                     console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
                     e.currentTarget.style.display = 'none'
                   }}
                 />
               ) : (
-                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
                   <span className="text-gray-400 text-xs font-medium">{brand.name}</span>
                 </div>
               )}
