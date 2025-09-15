@@ -181,8 +181,8 @@ export function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="flex items-baseline space-x-8 justify-center">
+          <div className="hidden md:block flex-1">
+            <div className="flex items-baseline space-x-4 justify-center flex-wrap max-w-full">
               {/* Home */}
               <motion.div variants={navItemVariants} initial="hidden" animate="visible" transition={{ delay: 0 * 0.1 }}>
                 <Link href="/" className="text-gray-700 hover:text-primary-900 px-3 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
@@ -214,10 +214,9 @@ export function Navbar() {
                   <motion.div
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="ml-1"
-                    style={{ display: 'flex', alignItems: 'center' }}
+                    className="ml-1 flex items-center"
                   >
-                    <ChevronDown className="w-4 h-4 text-gray-600" style={{ width: '16px', height: '16px' }} />
+                    <ChevronDown className="w-4 h-4 text-gray-800" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
@@ -499,24 +498,19 @@ export function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Cart Icon */}
+            {/* Cart Icon - ALWAYS VISIBLE */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link 
                 href="/cart"
-                className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors"
-                style={{ display: 'flex', alignItems: 'center' }}
+                className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors flex items-center"
               >
-                <ShoppingCart className="!w-6 !h-6" style={{ width: '24px', height: '24px' }} />
-                {isClient && cartCount > 0 && (
-                  <motion.span 
+                <ShoppingCart className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <span 
                     className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
-                    style={{ width: '20px', height: '20px', fontSize: '12px' }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500 }}
                   >
                     {cartCount}
-                  </motion.span>
+                  </span>
                 )}
               </Link>
             </motion.div>
