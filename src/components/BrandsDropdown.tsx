@@ -213,7 +213,7 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
       {isOpen && (
         <motion.div
           ref={dropdownRef}
-          className={`absolute top-full left-1/2 transform -translate-x-1/2 w-screen max-w-3xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-2 ${className}`}
+          className={`absolute top-full left-1/2 transform -translate-x-1/2 w-screen max-w-4xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-4 ${className}`}
           initial={{ opacity: 0, y: -15, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -15, scale: 0.9 }}
@@ -231,7 +231,7 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center items-start">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 justify-items-center items-center w-full">
             {loading ? (
               // Loading skeleton
               [...Array(6)].map((_, index) => (
@@ -267,29 +267,29 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Link
-                      href={`/brands/${brand.slug}`}
-                      className="group flex flex-col items-center justify-start p-3 transition-all duration-200 hover:scale-105 whitespace-nowrap w-full"
-                      onClick={onClose}
-                    >
-                      {/* Brand Logo */}
-                      <div className="mb-2">
-                        {logoSrc ? (
-                          <img
-                            src={logoSrc}
-                            alt={brand.name}
-                            className="w-24 h-24 object-contain"
-                            onError={(e) => {
-                              console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
-                              e.currentTarget.style.display = 'none'
-                            }}
-                          />
-                        ) : (
-                          <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <span className="text-gray-400 text-xs font-medium">{brand.name}</span>
-                          </div>
-                        )}
-                      </div>
+            <Link
+              href={`/brands/${brand.slug}`}
+              className="group flex flex-col items-center justify-center p-4 transition-all duration-200 hover:scale-105 whitespace-nowrap w-full"
+              onClick={onClose}
+            >
+            {/* Brand Logo */}
+            <div className="mb-3 flex justify-center">
+              {logoSrc ? (
+                <img
+                  src={logoSrc}
+                  alt={brand.name}
+                  className="w-32 h-32 object-contain"
+                  onError={(e) => {
+                    console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              ) : (
+                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-400 text-sm font-medium">{brand.name}</span>
+                </div>
+              )}
+            </div>
                       
                       {/* Brand Name */}
                       <h4 className="text-xs font-medium text-gray-900 text-center mb-1 group-hover:text-amber-600 transition-colors">

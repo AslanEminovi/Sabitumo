@@ -11,19 +11,11 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log('Starting auth callback...')
-        console.log('Current URL:', window.location.href)
-        console.log('URL hash:', window.location.hash)
-        console.log('URL search:', window.location.search)
-        
         // Wait a moment for the OAuth callback to be processed
         await new Promise(resolve => setTimeout(resolve, 1000))
         
         // Get the current session
         const { data, error } = await supabase.auth.getSession()
-        
-        console.log('Session data:', data)
-        console.log('Session error:', error)
         
         if (error) {
           console.error('Auth callback error:', error)
@@ -33,9 +25,6 @@ export default function AuthCallbackPage() {
 
         if (data.session?.user) {
           const user = data.session.user
-          console.log('User authenticated:', user.email)
-          console.log('User metadata:', user.user_metadata)
-          console.log('App metadata:', user.app_metadata)
           
           // Handle Google OAuth user data if needed
           if (user.app_metadata?.provider === 'google' && user.user_metadata) {
@@ -51,24 +40,19 @@ export default function AuthCallbackPage() {
                 country: user.user_metadata.country || 'Georgia'
               }
 
-              console.log('Updating user metadata with Google data:', googleData)
               // Update user metadata with Google data
               await supabase.auth.updateUser({ data: googleData })
             } catch (updateError) {
-              console.error('Error updating user metadata:', updateError)
               // Continue with auth even if metadata update fails
             }
           }
 
           // Redirect to home page
-          console.log('Redirecting to home page...')
           router.push('/')
         } else {
-          console.log('No session found, redirecting to login')
           router.push('/auth/login')
         }
       } catch (error) {
-        console.error('Auth callback failed:', error)
         router.push('/auth/login?error=auth_failed')
       }
     }
@@ -89,14 +73,9 @@ export default function AuthCallbackPage() {
         <h2 className="text-2xl font-semibold text-gray-900 mb-3">
           Completing sign in...
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-6">
           Please wait while we complete your authentication.
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <p className="text-sm text-blue-800">
-            <strong>Debug Info:</strong> Check the browser console for detailed logs about the authentication process.
-          </p>
-        </div>
         <div className="space-y-2">
           <button
             onClick={() => router.push('/')}

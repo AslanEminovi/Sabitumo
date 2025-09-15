@@ -161,7 +161,7 @@ export function Navbar() {
           </div>
 
           {/* Center - Logo */}
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-start ml-8">
             <motion.div 
               className="flex-shrink-0"
               whileHover={{ scale: 1.02 }}
@@ -214,8 +214,9 @@ export function Navbar() {
                   <motion.div
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
+                    className="ml-1"
                   >
-                    <ChevronDown className="w-5 h-5 text-gray-800 group-hover:text-amber-600" />
+                    <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-amber-600 transition-colors" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
