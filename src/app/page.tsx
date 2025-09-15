@@ -173,7 +173,7 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative homepage-hero">
       {/* Hero Section */}
       <section className="relative py-8 sm:py-12 md:py-20 overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[500px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-t-3xl rounded-b-3xl">
         {/* Tactical Background Pattern */}
