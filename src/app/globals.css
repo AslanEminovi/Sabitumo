@@ -39,21 +39,10 @@ body {
   padding-top: 0;
 }
 
-/* Universal fix for navbar overlap - applies to ALL pages automatically */
+/* Universal fix for navbar overlap - simple approach */
 main {
-  min-height: calc(100vh - 4rem); /* Account for navbar height */
-}
-
-/* Additional safety margin for page content - only when needed */
-.min-h-screen:not(.homepage-hero) {
-  padding-top: 0.5rem;
-}
-
-/* Ensure proper spacing for main page containers */
-.max-w-7xl:first-child:not(.no-spacing),
-.max-w-6xl:first-child:not(.no-spacing),
-.max-w-5xl:first-child:not(.no-spacing) {
-  margin-top: 0.5rem;
+  margin-top: 4rem; /* Push main content below fixed navbar */
+  min-height: calc(100vh - 4rem);
 }
 
 /* Ensure all containers respect viewport width */
