@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { CartProvider } from '@/context/CartContext'
+import { TranslationProvider } from '@/context/TranslationContext'
 import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -163,11 +164,13 @@ export default function RootLayout({
           `}
         </Script>
         
-        <CartProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </CartProvider>
+        <TranslationProvider>
+          <CartProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </CartProvider>
+        </TranslationProvider>
       </body>
     </html>
   )
