@@ -215,8 +215,9 @@ export function Navbar() {
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                     className="ml-1"
+                    style={{ display: 'flex', alignItems: 'center' }}
                   >
-                    <ChevronDown className="w-4 h-4 text-gray-600" />
+                    <ChevronDown className="w-4 h-4 text-gray-600" style={{ width: '16px', height: '16px' }} />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
@@ -498,16 +499,18 @@ export function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Cart - HUGE Icon */}
+            {/* Cart Icon */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link 
                 href="/cart"
                 className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors"
+                style={{ display: 'flex', alignItems: 'center' }}
               >
-                <ShoppingCart className="w-6 h-6" />
-                {cartCount > 0 && (
+                <ShoppingCart className="!w-6 !h-6" style={{ width: '24px', height: '24px' }} />
+                {isClient && cartCount > 0 && (
                   <motion.span 
                     className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
+                    style={{ width: '20px', height: '20px', fontSize: '12px' }}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500 }}
