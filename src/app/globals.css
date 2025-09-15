@@ -39,6 +39,23 @@ body {
   padding-top: 0;
 }
 
+/* Universal fix for navbar overlap - applies to ALL pages automatically */
+main {
+  min-height: calc(100vh - 6rem); /* Account for navbar height */
+}
+
+/* Additional safety margin for page content */
+.min-h-screen {
+  padding-top: 1rem !important;
+}
+
+/* Ensure proper spacing for all page containers */
+.max-w-7xl:first-child,
+.max-w-6xl:first-child,
+.max-w-5xl:first-child {
+  margin-top: 1rem !important;
+}
+
 /* Ensure all containers respect viewport width */
 #__next, [data-nextjs-scroll-focus-boundary] {
   max-width: 100vw !important;

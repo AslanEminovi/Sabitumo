@@ -149,7 +149,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} pt-16`}>
+      <body className={`${inter.className} pt-24`}>
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
