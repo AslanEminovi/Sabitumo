@@ -31,12 +31,16 @@ interface TranslationProviderProps {
 }
 
 export function TranslationProvider({ children }: TranslationProviderProps) {
+  // Always start with Georgian to ensure consistent SSR
   const [locale, setLocale] = useState<Locale>('ka')
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem('locale') as Locale
-    if (savedLocale && i18nConfig.locales.includes(savedLocale)) {
-      setLocale(savedLocale)
+    // Only change locale on client side after mount
+    if (typeof window !== 'undefined') {
+      const savedLocale = localStorage.getItem('locale') as Locale
+      if (savedLocale && i18nConfig.locales.includes(savedLocale)) {
+        setLocale(savedLocale)
+      }
     }
   }, [])
 

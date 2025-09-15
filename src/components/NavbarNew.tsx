@@ -32,6 +32,12 @@ export function NavbarNew() {
   const [isBrandsDropdownOpen, setIsBrandsDropdownOpen] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
+
+  // Toggle functions
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const toggleLanguageDropdown = () => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)
+  const toggleUserDropdown = () => setIsUserDropdownOpen(!isUserDropdownOpen)
+  const toggleBrandsDropdown = () => setIsBrandsDropdownOpen(!isBrandsDropdownOpen)
   
   // Refs for outside click detection
   const languageDropdownRef = useRef<HTMLDivElement>(null)
@@ -80,13 +86,14 @@ export function NavbarNew() {
     }
   }
 
-  // Language options
+  // Language options (fixed structure to prevent hydration issues)
   const languages = [
     { code: 'ka', name: 'ქართული', flag: '🇬🇪' },
     { code: 'en', name: 'English', flag: '🇺🇸' }
   ]
 
-  const currentLanguage = languages.find(lang => lang.code === locale)
+  // Always use Georgian as default during SSR to prevent hydration issues
+  const currentLanguage = languages.find(lang => lang.code === locale) || languages[0]
 
   return (
     <motion.nav 
@@ -95,47 +102,60 @@ export function NavbarNew() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16 w-full">
           
           {/* Logo */}
           <motion.div 
-            className="flex-shrink-0"
+            className="flex-shrink-0 min-w-0"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
-            <Link href="/" className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center space-x-2">
               <img 
                 src="/sabitumo1.png" 
                 alt="Sabitumo Logo" 
-                className="h-8 w-auto"
+                className="h-8 w-8 object-contain"
               />
-              <span className="text-base sm:text-lg font-bold text-primary-900 whitespace-nowrap">Sabitumo</span>
+              <span className="hidden sm:block text-lg font-bold text-primary-900">Sabitumo</span>
             </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6 flex-1 justify-center">
+          <div className="hidden md:flex items-center space-x-4 flex-1 justify-center px-4">
             {/* Home */}
-            <Link href="/" className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group">
+            <Link href="/" className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
               {t('navigation', 'home')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
             </Link>
 
             {/* Shop */}
-            <Link href="/shop" className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group">
+            <Link href="/shop" className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
               {t('navigation', 'shop')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
+            </Link>
+
+            {/* New Items */}
+            <Link href="/new-items" className="text-orange-500 hover:text-orange-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
+              {t('navigation', 'newItems') || 'New Items'}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all duration-200"></span>
             </Link>
 
             {/* Brands Dropdown */}
             <div className="relative" ref={brandsDropdownRef}>
               <button
-                onClick={() => setIsBrandsDropdownOpen(!isBrandsDropdownOpen)}
-                className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group flex items-center"
+                onClick={toggleBrandsDropdown}
+                aria-expanded={isBrandsDropdownOpen}
+                className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group flex items-center whitespace-nowrap"
               >
                 <span>{t('navigation', 'brands')}</span>
-                <ChevronDown className="w-4 h-4 ml-1 text-gray-800" />
+                <motion.div
+                  animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="ml-1 flex items-center"
+                >
+                  <ChevronDown className="w-4 h-4 text-gray-800" />
+                </motion.div>
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
               </button>
 
@@ -146,34 +166,35 @@ export function NavbarNew() {
             </div>
 
             {/* Categories */}
-            <Link href="/categories" className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group">
+            <Link href="/categories" className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
               {t('navigation', 'categories')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
             </Link>
 
             {/* About */}
-            <Link href="/about" className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group">
+            <Link href="/about" className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
               {t('navigation', 'about')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
             </Link>
 
             {/* Contact */}
-            <Link href="/contact" className="text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 relative group">
+            <Link href="/contact" className="text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
               {t('navigation', 'contact')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
             </Link>
           </div>
 
           {/* Right side icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             
             {/* Language Switcher */}
             <div className="relative" ref={languageDropdownRef}>
               <button
                 onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 px-2 py-2 text-sm font-medium transition-all duration-200"
+                className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 px-3 py-2 text-sm font-medium transition-all duration-200 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md"
               >
-                <span className="text-lg">{currentLanguage?.flag}</span>
+                <span className="text-base">{currentLanguage?.flag}</span>
+                <span className="hidden sm:block text-sm">{currentLanguage?.name}</span>
                 <ChevronDown className="w-4 h-4 text-gray-800" />
               </button>
               
@@ -305,9 +326,9 @@ export function NavbarNew() {
               href="/cart"
               className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors flex items-center"
             >
-              <ShoppingCart className="w-6 h-6" />
+              <ShoppingCart className="w-5 h-5" />
               {cartState.totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-normal">
                   {cartState.totalItems}
                 </span>
               )}
@@ -343,6 +364,9 @@ export function NavbarNew() {
                 </Link>
                 <Link href="/shop" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50 rounded-md transition-all duration-200">
                   {t('navigation', 'shop')}
+                </Link>
+                <Link href="/new-items" className="block px-3 py-2 text-base font-medium text-orange-500 hover:text-orange-600 hover:bg-orange-50 rounded-md transition-all duration-200">
+                  {t('navigation', 'newItems') || 'New Items'}
                 </Link>
                 <Link href="/categories" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50 rounded-md transition-all duration-200">
                   {t('navigation', 'categories')}

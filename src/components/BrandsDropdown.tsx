@@ -187,26 +187,7 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
     }
   }, [isOpen])
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-
-    if (isOpen) {
-      // Use a small delay to prevent immediate closing when clicking the button
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('mousedown', handleClickOutside)
-      }, 50)
-
-      return () => {
-        clearTimeout(timeoutId)
-        document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }
-  }, [isOpen, onClose])
+  // Note: Click-outside handling is managed by the parent Navbar component
 
   return (
     <AnimatePresence mode="wait">
@@ -231,14 +212,14 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-6 gap-3 justify-items-center items-center w-full">
+          <div className="grid grid-cols-6 gap-4 justify-items-center items-center w-full">
             {loading ? (
               // Loading skeleton
               [...Array(6)].map((_, index) => (
-                <div key={index} className="flex flex-col items-center p-2 animate-pulse">
-                  <div className="w-28 h-28 mb-2 bg-gray-200 rounded-lg"></div>
-                  <div className="h-3 w-12 mb-1 bg-gray-200 rounded"></div>
-                  <div className="h-2 w-8 bg-gray-200 rounded"></div>
+                <div key={index} className="flex flex-col items-center p-3 animate-pulse min-h-[200px] justify-center rounded-xl">
+                  <div className="w-32 h-32 mb-4 bg-gray-200 rounded-xl"></div>
+                  <div className="h-4 w-16 mb-2 bg-gray-200 rounded"></div>
+                  <div className="h-3 w-12 bg-gray-200 rounded"></div>
                 </div>
               ))
             ) : brands.length > 0 ? (
@@ -269,38 +250,38 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
                   >
             <Link
               href={`/brands/${brand.slug}`}
-              className="group flex flex-col items-center justify-center p-2 transition-all duration-200 hover:scale-105 whitespace-nowrap w-full"
+              className="group flex flex-col items-center justify-center p-3 transition-all duration-300 hover:scale-105 w-full h-full min-h-[200px] rounded-xl hover:bg-gray-50"
               onClick={onClose}
             >
-            {/* Brand Logo */}
-            <div className="mb-2 flex justify-center">
-              {logoSrc ? (
-                <img
-                  src={logoSrc}
-                  alt={brand.name}
-                  className="w-28 h-28 object-contain"
-                  onError={(e) => {
-                    console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              ) : (
-                <div className="w-28 h-28 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400 text-sm font-medium">{brand.name}</span>
-                </div>
-              )}
-            </div>
-                      
-                      {/* Brand Name */}
-                      <h4 className="text-xs font-medium text-gray-900 text-center mb-1 group-hover:text-amber-600 transition-colors">
-                        {brand.name}
-                      </h4>
-                      
-                      {/* Real Product Count */}
-                      <p className="text-xs text-gray-500 leading-tight">
-                        {brand.productCount} {locale === 'ka' ? 'პროდუქტი' : 'products'}
-                      </p>
-                    </Link>
+              {/* Brand Logo */}
+              <div className="mb-4 flex justify-center items-center w-full h-32">
+                {logoSrc ? (
+                  <img
+                    src={logoSrc}
+                    alt={brand.name}
+                    className="w-32 h-32 object-contain group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                ) : (
+                  <div className="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <span className="text-gray-400 text-sm font-medium text-center">{brand.name}</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Brand Name */}
+              <h4 className="text-sm font-semibold text-gray-900 text-center mb-2 group-hover:text-amber-600 transition-colors w-full leading-tight min-h-[20px]">
+                {brand.name}
+              </h4>
+              
+              {/* Real Product Count */}
+              <p className="text-xs text-gray-500 text-center leading-tight w-full">
+                {brand.productCount} {locale === 'ka' ? 'პროდუქტი' : 'products'}
+              </p>
+            </Link>
                   </motion.div>
                 )
               })

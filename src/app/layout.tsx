@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { NavbarNew as Navbar } from '@/components/NavbarNew'
+import { NavbarNew } from '@/components/NavbarNew'
 import { Footer } from '@/components/Footer'
 import { CartProvider } from '@/context/CartContext'
 import { TranslationProvider } from '@/context/TranslationContext'
@@ -166,7 +166,7 @@ export default function RootLayout({
         
         <TranslationProvider>
           <CartProvider>
-            <Navbar />
+            <NavbarNew />
             <main>{children}</main>
             <Footer />
           </CartProvider>

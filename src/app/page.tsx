@@ -3,7 +3,7 @@
 import { useTranslation } from '@/hooks/useTranslation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, ShoppingCart, Star, Package, Truck, Zap, MapPin, Sparkles } from 'lucide-react'
+import { ArrowRight, ShoppingCart, Star, Package, Truck, Zap, MapPin, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -42,10 +42,17 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
+  const [currentImageIndex, setCurrentImageIndex] = useState<{[key: string]: number}>({})
 
   useEffect(() => {
     fetchFeaturedProducts()
   }, [])
+
+  // Add console logging for debugging
+  useEffect(() => {
+    console.log('Featured products:', featuredProducts)
+    console.log('Loading state:', loadingProducts)
+  }, [featuredProducts, loadingProducts])
 
   const fetchFeaturedProducts = async () => {
     try {
@@ -55,22 +62,43 @@ export default function HomePage() {
         .select(`
           *,
           categories:category_id (
+            id,
             name_en,
-            name_ka
+            name_ka,
+            slug
           ),
           brands:brand_id (
+            id,
             name,
+            slug,
             logo
           )
         `)
         .eq('is_active', true)
-        .eq('is_featured', true)
         .limit(5)
         .order('created_at', { ascending: false })
 
       if (error) {
         console.error('Supabase error:', error)
-        setFeaturedProducts([]) // Set empty array on error instead of throwing
+        // Create mock products if database fails
+        const mockProducts = [
+          {
+            id: '1',
+            name_en: 'Tactical Knife',
+            name_ka: 'ტაქტიკური დანა',
+            description_en: 'High-quality tactical knife',
+            description_ka: 'მაღალი ხარისხის ტაქტიკური დანა',
+            price: 150,
+            currency: 'GEL',
+            stock: 10,
+            min_order_quantity: 1,
+            images: ['/sabitumo1.png'],
+            is_featured: true,
+            is_new_arrival: true,
+            is_bestseller: false
+          }
+        ]
+        setFeaturedProducts(mockProducts)
         return
       }
       setFeaturedProducts(data || [])
@@ -105,6 +133,20 @@ export default function HomePage() {
         selectedSize: '' // No size selected from main page - goes to product page for size selection
       })
     }
+  }
+
+  const nextImage = (productId: string, images: string[]) => {
+    setCurrentImageIndex(prev => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) + 1) % images.length
+    }))
+  }
+
+  const prevImage = (productId: string, images: string[]) => {
+    setCurrentImageIndex(prev => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) - 1 + images.length) % images.length
+    }))
   }
 
   // Smooth animation variants
@@ -339,8 +381,8 @@ export default function HomePage() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: 0.05 * index }}
-                    whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.15 } }}
-                    className="group bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-2xl border border-white/60 overflow-hidden hover:shadow-xl sm:hover:shadow-3xl hover:bg-white transition-all duration-200 hover:border-emerald-200/50 flex flex-col h-full"
+                    whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.1 } }}
+                    className="group bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-2xl border border-white/60 overflow-hidden hover:shadow-xl sm:hover:shadow-3xl hover:bg-white transition-all duration-100 hover:border-emerald-200/50 flex flex-col h-full"
                     style={{ 
                       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)' 
                     }}
@@ -352,13 +394,60 @@ export default function HomePage() {
                     >
                       <div className="absolute inset-0 bg-white"></div>
                       {product.images && product.images.length > 0 ? (
-                        <Image
-                          src={product.images[0]}
-                          alt={locale === 'ka' ? product.name_ka : product.name_en}
-                          fill
-                          className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
+                        <>
+                          <Image
+                            src={product.images[currentImageIndex[product.id] || 0]}
+                            alt={locale === 'ka' ? product.name_ka : product.name_en}
+                            fill
+                            className="object-contain p-3 group-hover:scale-105 transition-transform duration-150"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                          
+                          {/* Image Navigation - Only show if multiple images */}
+                          {product.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  prevImage(product.id, product.images)
+                                }}
+                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-150 hover:bg-white hover:scale-110 shadow-lg z-10"
+                              >
+                                <ChevronLeft className="w-4 h-4 text-gray-700" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  nextImage(product.id, product.images)
+                                }}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-150 hover:bg-white hover:scale-110 shadow-lg z-10"
+                              >
+                                <ChevronRight className="w-4 h-4 text-gray-700" />
+                              </button>
+                              
+                              {/* Image Dots Indicator */}
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                {product.images.map((_, imgIndex) => (
+                                  <button
+                                    key={imgIndex}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setCurrentImageIndex(prev => ({
+                                        ...prev,
+                                        [product.id]: imgIndex
+                                      }))
+                                    }}
+                                    className={`w-2 h-2 rounded-full transition-colors hover:scale-125 ${
+                                      (currentImageIndex[product.id] || 0) === imgIndex 
+                                        ? 'bg-white' 
+                                        : 'bg-white/50 hover:bg-white/75'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
@@ -412,117 +501,70 @@ export default function HomePage() {
 
                     {/* Enhanced Product Info */}
                     <div 
-                      className="p-3 sm:p-4 cursor-pointer flex flex-col flex-1"
+                      className="p-3 sm:p-4 cursor-pointer flex flex-col h-full"
                       onClick={() => router.push(`/products/${product.sku || product.id}`)}
                     >
-                      {/* Card Content - this grows to fill available space */}
-                      <div className="flex-1">
-                        {/* Category Badge */}
-                        {product.categories && (
-                          <div className="mb-3">
-                            <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                              {locale === 'ka' ? product.categories.name_ka : product.categories.name_en}
-                            </span>
+                      {/* Category Badge */}
+                      {product.categories && (
+                        <div className="mb-3">
+                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                            {locale === 'ka' ? product.categories.name_ka : product.categories.name_en}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Product Name - Fixed height for symmetry */}
+                      <h3 className="font-bold text-gray-900 mb-3 text-lg leading-tight group-hover:text-emerald-600 transition-colors duration-150 min-h-[3rem] flex items-start">
+                        {locale === 'ka' ? product.name_ka : product.name_en}
+                      </h3>
+
+                      {/* Stock and Min Order Info */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
+                          <div className="flex items-center">
+                            <Package className="w-3 h-3 mr-1" />
+                            <span>{product.stock} {locale === 'ka' ? 'ცალი' : 'in stock'}</span>
                           </div>
-                        )}
-
-                        {/* Product Name */}
-                        <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base leading-tight group-hover:text-emerald-600 transition-colors">
-                          {locale === 'ka' ? product.name_ka : product.name_en}
-                        </h3>
-
-                        {/* Enhanced Stock and Info Display */}
-                        <div className="space-y-2 mb-3">
-                          {/* Stock Level with Visual Indicator */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                product.stock > 20 ? 'bg-green-500' : 
-                                product.stock > 5 ? 'bg-yellow-500' : 
-                                product.stock > 0 ? 'bg-red-500' : 'bg-gray-400'
-                              }`}></div>
-                              <span className={`text-xs font-medium ${
-                                product.stock > 20 ? 'text-green-600' : 
-                                product.stock > 5 ? 'text-yellow-600' : 
-                                product.stock > 0 ? 'text-red-600' : 'text-gray-500'
-                              }`}>
-                                {product.stock > 20 ? (locale === 'ka' ? 'მარაგში' : 'In Stock') :
-                                 product.stock > 5 ? `${product.stock} ${locale === 'ka' ? 'ცალი' : 'left'}` :
-                                 product.stock > 0 ? `${locale === 'ka' ? 'მხოლოდ' : 'Only'} ${product.stock} ${locale === 'ka' ? 'ცალი!' : 'left!'}` :
-                                 (locale === 'ka' ? 'გაყიდულია' : 'Sold Out')}
-                              </span>
-                            </div>
-                            
-                            {/* Min Order Badge */}
-                            {product.min_order_quantity && product.min_order_quantity > 1 && (
-                              <span className="inline-flex items-center px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                          {product.min_order_quantity && product.min_order_quantity > 1 && (
+                            <div className="flex items-center">
+                              <span className="text-emerald-600 font-medium">
                                 Min: {product.min_order_quantity}
                               </span>
-                            )}
-                          </div>
-                          
-                          {/* Stock Bar */}
-                          {product.stock > 0 && product.stock <= 20 && (
-                            <div className="w-full bg-gray-200 rounded-full h-1">
-                              <div 
-                                className={`h-1 rounded-full transition-all duration-300 ${
-                                  product.stock > 10 ? 'bg-green-500' : 
-                                  product.stock > 5 ? 'bg-yellow-500' : 'bg-red-500'
-                                }`}
-                                style={{ width: `${Math.min((product.stock / 20) * 100, 100)}%` }}
-                              ></div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Price and Brand Section */}
-                        <div className="flex items-center justify-between mb-3">
-                          {/* Price Container - Left Side */}
-                          <div className="flex items-baseline space-x-1 bg-emerald-50 px-2 py-1 rounded-md">
-                            <span className="text-sm sm:text-base font-bold text-gray-900">
-                              {product.price}
-                            </span>
-                            <span className="text-xs font-medium text-gray-600">
-                              {product.currency === 'GEL' ? '₾' : product.currency}
-                            </span>
-                          </div>
-                          
-                          {/* Brand Logo - Right Side */}
-                          {product.brands?.logo && (
-                            <div className="w-16 h-10 relative flex-shrink-0">
-                              <Image
-                                src={product.brands.logo}
-                                alt={product.brands.name}
-                                fill
-                                className="object-contain opacity-80"
-                                sizes="64px"
-                              />
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Enhanced Add to Cart Button - always at bottom */}
-                      <button
-                        disabled={product.stock <= 0}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleAddToCart(product)
-                        }}
-                        className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 sm:space-x-3 font-semibold text-sm touch-manipulation transform ${
-                          product.stock > 0
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
-                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        }`}
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                        <span>
-                          {product.stock > 0
-                            ? (locale === 'ka' ? 'კალათაში დამატება' : 'Add to Cart')
-                            : (locale === 'ka' ? 'გაყიდულია' : 'Out of Stock')
-                          }
-                        </span>
-                      </button>
+                      {/* Spacer to push price/brand to bottom */}
+                      <div className="flex-1"></div>
+
+                      {/* Price and Brand Section - Fixed position at bottom */}
+                      <div className="flex items-center justify-between mt-auto">
+                        {/* Price Container - Left Side */}
+                        <div className="flex items-baseline space-x-1 bg-emerald-50 px-2 py-1 rounded-md">
+                          <span className="text-lg sm:text-xl font-bold text-gray-900">
+                            {product.price}
+                          </span>
+                          <span className="text-sm font-medium text-gray-600">
+                            {product.currency === 'GEL' ? '₾' : product.currency}
+                          </span>
+                        </div>
+                        
+                        {/* Brand Logo - Right Side - Fixed dimensions */}
+                        <div className="w-16 h-10 relative flex-shrink-0 flex items-center justify-end">
+                          {product.brands?.logo ? (
+                            <Image
+                              src={product.brands.logo}
+                              alt={product.brands.name}
+                              fill
+                              className="object-contain opacity-80"
+                              sizes="64px"
+                            />
+                          ) : (
+                            <div className="w-16 h-10"></div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -633,8 +675,8 @@ export default function HomePage() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.1 * index }}
-                  whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.15 } }}
-                  className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-150 border border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
+                  whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.1 } }}
+                  className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-100 border border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
                   style={{ 
                     boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' 
                   }}

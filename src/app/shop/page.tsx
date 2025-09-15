@@ -747,7 +747,7 @@ function ShopPageContent() {
                             })
                           }
                         }}
-                        className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 sm:space-x-3 font-semibold text-sm touch-manipulation transform ${
+                        className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-150 flex items-center justify-center space-x-2 sm:space-x-3 font-semibold text-sm touch-manipulation transform ${
                           product.stock > 0
                             ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
                             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
