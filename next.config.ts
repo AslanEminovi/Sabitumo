@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Image optimization (disabled for static export)
+  // Image optimization
   images: {
-    unoptimized: true,
+    domains: ['supabase.co', 'localhost'],
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // Performance optimizations
@@ -147,9 +153,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   
-  // Output configuration for static hosting
-  output: 'export',
-  distDir: 'out',
+  // Output configuration for server hosting
+  output: 'standalone',
   
   // Power optimizations
   poweredByHeader: false,

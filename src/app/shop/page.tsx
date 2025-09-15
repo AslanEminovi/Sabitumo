@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -53,7 +53,7 @@ interface Category {
   slug: string
 }
 
-export default function ShopPage() {
+function ShopPageContent() {
   const { t, locale } = useTranslation()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -832,5 +832,15 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
+    </div>}>
+      <ShopPageContent />
+    </Suspense>
   )
 }
