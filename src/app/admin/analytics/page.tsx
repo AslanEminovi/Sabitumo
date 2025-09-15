@@ -97,19 +97,6 @@ export default function AdminAnalytics() {
     topCategories: []
   })
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !(await isAdmin())) {
-        router.push('/auth/login')
-        return
-      }
-      await fetchAnalytics()
-      setLoading(false)
-    }
-    checkAuth()
-  }, [router, selectedPeriod, fetchAnalytics])
-
   const getDateRange = useCallback((period: string) => {
     const now = new Date()
     let startDate = new Date()
@@ -204,7 +191,7 @@ export default function AdminAnalytics() {
         monthlyData[monthKey].orders += 1
       })
 
-        const salesByMonth = Object.entries(monthlyData)
+      const salesByMonth = Object.entries(monthlyData)
         .map(([monthKey, data]) => {
           const [, month] = monthKey.split('-')
           return {
@@ -228,51 +215,67 @@ export default function AdminAnalytics() {
         percentage: totalOrders > 0 ? (count / totalOrders) * 100 : 0
       }))
 
-      // Process top products
-      const productStats: { [key: string]: { name: string, quantity: number, revenue: number } } = {}
-      
+      // Process top categories
+      const categoryCounts: { [key: string]: { name_en: string, name_ka: string, orders: number, revenue: number } } = {}
       orders?.forEach(order => {
         order.order_items?.forEach((item: any) => {
-          const productId = item.products?.id
-          const productName = locale === 'ka' ? item.products?.name_ka : item.products?.name_en
-          
-          if (!productStats[productId]) {
-            productStats[productId] = { name: productName || 'Unknown', quantity: 0, revenue: 0 }
+          const category = item.products?.categories
+          if (category) {
+            const key = category.name_en
+            if (!categoryCounts[key]) {
+              categoryCounts[key] = {
+                name_en: category.name_en,
+                name_ka: category.name_ka,
+                orders: 0,
+                revenue: 0
+              }
+            }
+            categoryCounts[key].orders += item.quantity
+            categoryCounts[key].revenue += parseFloat(item.price || '0') * item.quantity
           }
-          
-          productStats[productId].quantity += item.quantity
-          productStats[productId].revenue += item.quantity * parseFloat(item.price || '0')
         })
       })
 
-      const topProducts = Object.entries(productStats)
-        .map(([id, data]) => ({ id, ...data }))
-        .sort((a, b) => b.revenue - a.revenue)
+      const topCategories = Object.values(categoryCounts)
+        .map(category => ({
+          name: locale === 'ka' ? category.name_ka : category.name_en,
+          orders: category.orders,
+          revenue: category.revenue
+        }))
+        .sort((a, b) => b.orders - a.orders)
         .slice(0, 10)
 
-      // Process top categories
-      const categoryStats: { [key: string]: { orders: number, revenue: number } } = {}
-      
+      // Process top products
+      const productCounts: { [key: string]: { id: string, name_en: string, name_ka: string, count: number, revenue: number } } = {}
       orders?.forEach(order => {
         order.order_items?.forEach((item: any) => {
-          const categoryName = locale === 'ka' 
-            ? item.products?.categories?.name_ka 
-            : item.products?.categories?.name_en
-          
-          if (categoryName) {
-            if (!categoryStats[categoryName]) {
-              categoryStats[categoryName] = { orders: 0, revenue: 0 }
+          const product = item.products
+          if (product) {
+            const key = product.id
+            if (!productCounts[key]) {
+              productCounts[key] = {
+                id: product.id,
+                name_en: product.name_en,
+                name_ka: product.name_ka,
+                count: 0,
+                revenue: 0
+              }
             }
-            categoryStats[categoryName].orders += 1
-            categoryStats[categoryName].revenue += item.quantity * parseFloat(item.price || '0')
+            productCounts[key].count += item.quantity
+            productCounts[key].revenue += parseFloat(item.price || '0') * item.quantity
           }
         })
       })
 
-      const topCategories = Object.entries(categoryStats)
-        .map(([name, data]) => ({ name, ...data }))
-        .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 5)
+      const topProducts = Object.values(productCounts)
+        .map(product => ({
+          id: product.id,
+          name: locale === 'ka' ? product.name_ka : product.name_en,
+          quantity: product.count,
+          revenue: product.revenue
+        }))
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 10)
 
       setAnalytics({
         totalRevenue,
@@ -291,6 +294,19 @@ export default function AdminAnalytics() {
       setRefreshing(false)
     }
   }, [selectedPeriod, getDateRange, getMonthName, locale])
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !(await isAdmin())) {
+        router.push('/auth/login')
+        return
+      }
+      await fetchAnalytics()
+      setLoading(false)
+    }
+    checkAuth()
+  }, [router, selectedPeriod, fetchAnalytics])
 
   if (loading) {
     return (
