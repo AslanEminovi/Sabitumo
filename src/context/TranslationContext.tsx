@@ -7,7 +7,11 @@ import { i18nConfig } from '@/i18n/config'
 
 type Locale = 'en' | 'ka'
 type TranslationKey = keyof typeof en
-type NestedTranslationKey<T extends TranslationKey> = keyof typeof en[T]
+type NestedTranslationKey<T extends TranslationKey> = T extends keyof typeof en 
+  ? typeof en[T] extends Record<string, any> 
+    ? keyof typeof en[T] 
+    : never 
+  : never
 
 interface TranslationContextType {
   locale: Locale
@@ -44,7 +48,7 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
     
     if (nestedKey) {
       const section = translations[key] as Record<string, string>
-      return section[nestedKey] || key
+      return section[nestedKey as string] || String(key)
     }
     
     const section = translations[key]
@@ -52,7 +56,7 @@ export function TranslationProvider({ children }: TranslationProviderProps) {
       return section
     }
     
-    return key
+    return String(key)
   }
 
   const changeLocale = (newLocale: Locale) => {
