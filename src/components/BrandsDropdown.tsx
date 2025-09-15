@@ -213,7 +213,7 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
       {isOpen && (
         <motion.div
           ref={dropdownRef}
-          className={`absolute top-full left-1/2 transform -translate-x-1/2 w-screen max-w-4xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-4 ${className}`}
+          className={`fixed top-20 left-1/2 transform -translate-x-1/2 w-screen max-w-5xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-4 ${className}`}
           initial={{ opacity: 0, y: -15, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -15, scale: 0.9 }}
@@ -231,12 +231,12 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 justify-items-center items-center w-full">
+          <div className="grid grid-cols-6 gap-4 justify-items-center items-center w-full">
             {loading ? (
               // Loading skeleton
               [...Array(6)].map((_, index) => (
                 <div key={index} className="flex flex-col items-center p-2 animate-pulse">
-                  <div className="w-24 h-24 mb-2 bg-gray-200 rounded-lg"></div>
+                  <div className="w-20 h-20 mb-2 bg-gray-200 rounded-lg"></div>
                   <div className="h-3 w-12 mb-1 bg-gray-200 rounded"></div>
                   <div className="h-2 w-8 bg-gray-200 rounded"></div>
                 </div>
@@ -269,24 +269,24 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
                   >
             <Link
               href={`/brands/${brand.slug}`}
-              className="group flex flex-col items-center justify-center p-4 transition-all duration-200 hover:scale-105 whitespace-nowrap w-full"
+              className="group flex flex-col items-center justify-center p-2 transition-all duration-200 hover:scale-105 whitespace-nowrap w-full"
               onClick={onClose}
             >
             {/* Brand Logo */}
-            <div className="mb-3 flex justify-center">
+            <div className="mb-2 flex justify-center">
               {logoSrc ? (
                 <img
                   src={logoSrc}
                   alt={brand.name}
-                  className="w-32 h-32 object-contain"
+                  className="w-20 h-20 object-contain"
                   onError={(e) => {
                     console.error('Image failed to load:', logoSrc, 'for brand:', brand.name)
                     e.currentTarget.style.display = 'none'
                   }}
                 />
               ) : (
-                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400 text-sm font-medium">{brand.name}</span>
+                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-400 text-xs font-medium">{brand.name}</span>
                 </div>
               )}
             </div>
