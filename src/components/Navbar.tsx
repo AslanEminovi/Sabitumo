@@ -214,9 +214,9 @@ export function Navbar() {
                   <motion.div
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="ml-2"
+                    className="ml-1"
                   >
-                    <ChevronDown className="w-6 h-6 text-gray-600 font-bold" />
+                    <ChevronDown className="w-4 h-4 text-gray-600" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
@@ -502,12 +502,12 @@ export function Navbar() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link 
                 href="/cart"
-                className="relative p-4 text-gray-700 hover:text-amber-600 transition-colors"
+                className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors"
               >
-                <ShoppingCart className="w-14 h-14" />
+                <ShoppingCart className="w-6 h-6" />
                 {cartCount > 0 && (
                   <motion.span 
-                    className="absolute -top-1 -right-1 bg-amber-500 text-white text-base rounded-full h-8 w-8 flex items-center justify-center font-bold"
+                    className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500 }}
