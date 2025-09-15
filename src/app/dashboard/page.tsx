@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -11,27 +11,20 @@ import {
   Bell, 
   User, 
   Settings, 
-  CreditCard,
-  MapPin,
   Clock,
   Star,
   TrendingUp,
   TrendingDown,
-  Calendar,
-  Eye,
-  Filter,
-  Search,
   ArrowRight,
   CheckCircle,
-  AlertCircle,
   Truck,
   RefreshCw,
   DollarSign,
   Award,
   BarChart3,
-  Activity,
   Target,
-  Zap
+  Zap,
+  X
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -67,7 +60,7 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -97,21 +90,7 @@ export default function DashboardPage() {
     monthlySpending: []
   })
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/auth/login')
-        return
-      }
-      setUser(user)
-      await fetchDashboardData(user.id)
-      setLoading(false)
-    }
-    checkAuth()
-  }, [router])
-
-  const fetchDashboardData = async (userId: string) => {
+  const fetchDashboardData = useCallback(async (userId: string) => {
     try {
       setRefreshing(true)
       
@@ -238,7 +217,13 @@ export default function DashboardPage() {
       else if (totalSpent >= 1000) loyaltyTier = 'Silver'
 
       // Generate real notifications based on order status
-      const notifications = []
+      const notifications: Array<{
+        id: string
+        type: string
+        message: string
+        time: string
+        read: boolean
+      }> = []
       
       // Check for recent order updates
       const recentPendingOrders = orders?.filter(o => 
@@ -304,7 +289,21 @@ export default function DashboardPage() {
     } finally {
       setRefreshing(false)
     }
-  }
+  }, [locale])
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/auth/login')
+        return
+      }
+      setUser(user)
+      await fetchDashboardData(user.id)
+      setLoading(false)
+    }
+    checkAuth()
+  }, [router, fetchDashboardData])
 
   const tabs = [
     { id: 'overview', label: locale === 'ka' ? 'მიმოხილვა' : 'Overview', icon: BarChart3 },

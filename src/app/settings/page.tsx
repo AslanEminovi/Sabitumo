@@ -9,25 +9,13 @@ import {
   Bell, 
   Shield, 
   Globe, 
-  Palette, 
-  CreditCard, 
   Trash2, 
   Save,
   User,
-  Lock,
   Eye,
   EyeOff,
-  Smartphone,
-  Mail,
   Download,
-  Upload,
-  RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  Info,
-  Moon,
-  Sun,
-  Monitor
+  Calendar
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -59,7 +47,7 @@ interface PreferenceSettings {
 }
 
 export default function SettingsPage() {
-  const { t, locale, changeLocale } = useTranslation()
+  const { locale, changeLocale } = useTranslation()
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)

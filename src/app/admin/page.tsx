@@ -12,26 +12,13 @@ import {
   ShoppingCart, 
   Users, 
   TrendingUp, 
-  TrendingDown,
-  Eye,
-  BarChart3,
   PlusCircle,
-  Settings,
   Brain,
   Upload,
-  FileText,
-  Calendar,
-  AlertTriangle,
-  CheckCircle,
-  Activity,
-  Star,
-  Clock,
   RefreshCw,
-  Download,
-  Filter,
-  Search,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowLeft,
+  BarChart3
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -66,7 +53,7 @@ interface QuickAction {
 }
 
 export default function AdminDashboard() {
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)

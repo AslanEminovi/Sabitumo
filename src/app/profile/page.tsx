@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -84,7 +84,7 @@ interface UserAnalytics {
 }
 
 export default function ProfilePage() {
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -129,57 +129,7 @@ export default function ProfilePage() {
     lastOrderDate: ''
   })
 
-  useEffect(() => {
-    let mounted = true
-
-    const checkAuth = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!mounted) return
-        
-        if (!user) {
-          router.push('/auth/login')
-          return
-        }
-        
-        setUser(user)
-        
-        // Load profile data from user metadata or database
-        const profile: UserProfile = {
-          id: user.id,
-          email: user.email || '',
-          firstName: user.user_metadata?.first_name || user.user_metadata?.given_name || '',
-          lastName: user.user_metadata?.last_name || user.user_metadata?.family_name || '',
-          phone: user.user_metadata?.phone || user.phone || '',
-          address: user.user_metadata?.address || '',
-          city: user.user_metadata?.city || '',
-          country: user.user_metadata?.country || 'Georgia',
-          avatar_url: user.user_metadata?.avatar_url,
-          created_at: user.created_at,
-          email_verified: user.email_confirmed_at ? true : false,
-          phone_verified: user.phone_confirmed_at ? true : false
-        }
-        
-        setProfileData(profile)
-        
-        // Fetch comprehensive user analytics
-        await fetchUserAnalytics(user.id, user.created_at)
-        
-      } catch (error) {
-        console.error('Error loading profile:', error)
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    checkAuth()
-
-    return () => {
-      mounted = false
-    }
-  }, [router])
-
-  const fetchUserAnalytics = async (userId: string, joinDate: string) => {
+  const fetchUserAnalytics = useCallback(async (userId: string, joinDate: string) => {
     try {
       setRefreshing(true)
       
@@ -358,7 +308,57 @@ export default function ProfilePage() {
     } finally {
       setRefreshing(false)
     }
-  }
+  }, [locale])
+
+  useEffect(() => {
+    let mounted = true
+
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!mounted) return
+        
+        if (!user) {
+          router.push('/auth/login')
+          return
+        }
+        
+        setUser(user)
+        
+        // Load profile data from user metadata or database
+        const profile: UserProfile = {
+          id: user.id,
+          email: user.email || '',
+          firstName: user.user_metadata?.first_name || user.user_metadata?.given_name || '',
+          lastName: user.user_metadata?.last_name || user.user_metadata?.family_name || '',
+          phone: user.user_metadata?.phone || user.phone || '',
+          address: user.user_metadata?.address || '',
+          city: user.user_metadata?.city || '',
+          country: user.user_metadata?.country || 'Georgia',
+          avatar_url: user.user_metadata?.avatar_url,
+          created_at: user.created_at,
+          email_verified: user.email_confirmed_at ? true : false,
+          phone_verified: user.phone_confirmed_at ? true : false
+        }
+        
+        setProfileData(profile)
+        
+        // Fetch comprehensive user analytics
+        await fetchUserAnalytics(user.id, user.created_at)
+        
+      } catch (error) {
+        console.error('Error loading profile:', error)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+
+    checkAuth()
+
+    return () => {
+      mounted = false
+    }
+  }, [router, fetchUserAnalytics])
 
   const handleSave = async () => {
     if (!user) return
