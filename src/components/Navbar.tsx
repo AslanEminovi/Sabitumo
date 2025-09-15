@@ -214,9 +214,9 @@ export function Navbar() {
                   <motion.div
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="ml-2 bg-red-500 rounded-full p-2"
+                    className="ml-2"
                   >
-                    <ChevronDown className="w-6 h-6 text-white font-black stroke-2" />
+                    <ChevronDown className="w-6 h-6 text-gray-600 font-bold" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
