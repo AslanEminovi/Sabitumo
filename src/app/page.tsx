@@ -389,7 +389,7 @@ export default function HomePage() {
                   >
                     {/* Enhanced Product Image with Navigation */}
                     <div 
-                      className="relative h-40 sm:h-48 overflow-hidden cursor-pointer"
+                      className="relative h-48 sm:h-56 md:h-64 overflow-hidden cursor-pointer"
                       onClick={() => router.push(`/products/${product.sku || product.id}`)}
                     >
                       <div className="absolute inset-0 bg-white"></div>
