@@ -1,0 +1,4 @@
+/api/ai-analyze-product  /.netlify/functions/ai-analyze-product  200
+/api/checkout  /.netlify/functions/checkout  200  
+/api/abandoned-cart-recovery  /.netlify/functions/abandoned-cart-recovery  200
+/*    /index.html   200
