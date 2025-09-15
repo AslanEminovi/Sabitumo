@@ -213,7 +213,7 @@ export const BrandsDropdown: React.FC<BrandsDropdownProps> = ({
       {isOpen && (
         <motion.div
           ref={dropdownRef}
-          className={`fixed top-20 left-1/2 transform -translate-x-1/2 w-screen max-w-5xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-4 ${className}`}
+          className={`fixed top-16 left-1/2 transform -translate-x-1/2 w-screen max-w-5xl mx-4 bg-white border border-gray-200 rounded-lg shadow-xl z-50 mt-1 ${className}`}
           initial={{ opacity: 0, y: -15, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -15, scale: 0.9 }}

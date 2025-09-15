@@ -182,7 +182,7 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-2 flex items-baseline space-x-8">
+            <div className="flex items-baseline space-x-8 justify-center">
               {/* Home */}
               <motion.div variants={navItemVariants} initial="hidden" animate="visible" transition={{ delay: 0 * 0.1 }}>
                 <Link href="/" className="text-gray-700 hover:text-primary-900 px-3 py-2 text-sm font-medium transition-all duration-200 relative group whitespace-nowrap">
@@ -214,9 +214,9 @@ export function Navbar() {
                   <motion.div
                     animate={{ rotate: isBrandsDropdownOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="ml-3 bg-gray-100 rounded-full p-1"
+                    className="ml-2 bg-red-500 rounded-full p-2"
                   >
-                    <ChevronDown className="w-8 h-8 text-black font-black stroke-2" />
+                    <ChevronDown className="w-6 h-6 text-white font-black stroke-2" />
                   </motion.div>
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-500 group-hover:w-full transition-all duration-200"></span>
                 </button>
