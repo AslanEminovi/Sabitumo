@@ -109,7 +109,7 @@ export function NavbarNew() {
 
   return (
     <motion.nav 
-      className={`${isScrolled ? 'glass-effect-scrolled' : 'glass-effect'} shadow-elegant border-b border-gray-200/50 sticky top-0 z-50 rounded-b-3xl w-full max-w-full`}
+      className={`${isScrolled ? 'glass-effect-scrolled' : 'glass-effect'} shadow-elegant border-b border-gray-200/50 fixed top-0 left-0 right-0 z-50 rounded-b-3xl w-full max-w-full transition-all duration-300`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}

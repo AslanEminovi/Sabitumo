@@ -203,37 +203,49 @@ export default function AdminProductsPage() {
               </p>
             </div>
             
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/admin/products/add"
-                className="bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700 transition-colors flex items-center space-x-2 shadow-lg"
+                className="group relative bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center space-x-2 backdrop-blur-sm"
               >
-                <Plus className="w-5 h-5" />
-                <span>{locale === 'ka' ? 'ახალი პროდუქტი' : 'Add Product'}</span>
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Plus className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                </div>
+                <span className="font-medium">{locale === 'ka' ? 'ახალი პროდუქტი' : 'Add Product'}</span>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/0 to-emerald-500/0 group-hover:from-emerald-500/5 group-hover:to-teal-500/5 transition-all duration-200"></div>
               </Link>
 
               <Link
                 href="/admin/analytics"
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2 shadow-lg"
+                className="group relative bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center space-x-2 backdrop-blur-sm"
               >
-                <BarChart className="w-5 h-5" />
-                <span>{locale === 'ka' ? 'ანალიტიკა' : 'Analytics'}</span>
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <BarChart className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                </div>
+                <span className="font-medium">{locale === 'ka' ? 'ანალიტიკა' : 'Analytics'}</span>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-200"></div>
               </Link>
               
               <button
                 onClick={() => setShowAIModal(true)}
-                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2 shadow-lg"
+                className="group relative bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center space-x-2 backdrop-blur-sm"
               >
-                <Brain className="w-5 h-5" />
-                <span>{locale === 'ka' ? 'AI ანალიზი' : 'AI Analysis'}</span>
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Brain className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                </div>
+                <span className="font-medium">{locale === 'ka' ? 'AI ანალიზი' : 'AI Analysis'}</span>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 transition-all duration-200"></div>
               </button>
               
               <Link
                 href="/admin/products/bulk-import"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-lg"
+                className="group relative bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center space-x-2 backdrop-blur-sm"
               >
-                <Upload className="w-5 h-5" />
-                <span>{locale === 'ka' ? 'ბულკ იმპორტი' : 'Bulk Import'}</span>
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Upload className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                </div>
+                <span className="font-medium">{locale === 'ka' ? 'ბულკ იმპორტი' : 'Bulk Import'}</span>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/5 transition-all duration-200"></div>
               </Link>
             </div>
           </div>

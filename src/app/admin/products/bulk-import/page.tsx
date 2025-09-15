@@ -5,9 +5,29 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useIsAdmin } from '@/lib/admin'
 import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Upload, Download, FileText, AlertCircle, CheckCircle, X, Package } from 'lucide-react'
+import { 
+  ArrowLeft, 
+  Upload, 
+  Download, 
+  FileText, 
+  AlertCircle, 
+  CheckCircle, 
+  X, 
+  Package,
+  RefreshCw,
+  Eye,
+  Trash2,
+  Play,
+  Pause,
+  SkipForward,
+  AlertTriangle,
+  Info,
+  Zap,
+  Clock,
+  Target
+} from 'lucide-react'
 import Papa from 'papaparse'
 
 interface CSVProduct {
@@ -30,6 +50,15 @@ interface ImportResult {
   success: number
   failed: number
   errors: string[]
+  warnings: string[]
+  skipped: number
+}
+
+interface ValidationError {
+  row: number
+  field: string
+  message: string
+  severity: 'error' | 'warning'
 }
 
 export default function BulkImportPage() {
@@ -40,9 +69,13 @@ export default function BulkImportPage() {
   
   const [csvData, setCsvData] = useState<CSVProduct[]>([])
   const [importing, setImporting] = useState(false)
+  const [validating, setValidating] = useState(false)
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [brands, setBrands] = useState<any[]>([])
+  const [importProgress, setImportProgress] = useState(0)
+  const [currentStep, setCurrentStep] = useState<'upload' | 'validate' | 'preview' | 'import' | 'complete'>('upload')
 
   // Fetch categories and brands for reference
   const fetchReferences = React.useCallback(async () => {
@@ -51,7 +84,7 @@ export default function BulkImportPage() {
         supabase.from('categories').select('*').eq('is_active', true),
         supabase.from('brands').select('*').eq('is_active', true)
       ])
-      
+
       if (categoriesRes.data) setCategories(categoriesRes.data)
       if (brandsRes.data) setBrands(brandsRes.data)
     } catch (error) {
@@ -60,23 +93,42 @@ export default function BulkImportPage() {
   }, [])
 
   React.useEffect(() => {
-    if (!adminLoading && !isAdminUser) {
-      router.push('/')
-      return
-    }
-    
     if (isAdminUser) {
       fetchReferences()
+    } else if (!adminLoading && !isAdminUser) {
+      router.push('/')
     }
   }, [isAdminUser, adminLoading, router, fetchReferences])
 
-  // Show loading or redirect if not admin
-  if (adminLoading) {
-    return <div>Loading...</div>
-  }
+  const downloadTemplate = () => {
+    const template = [
+      {
+        name_en: 'Sample Product',
+        name_ka: 'სანიმუშო პროდუქტი',
+        description_en: 'This is a sample product description',
+        description_ka: 'ეს არის სანიმუშო პროდუქტის აღწერა',
+        price: 99.99,
+        currency: 'GEL',
+        category_id: 'category-uuid-here',
+        brand_id: 'brand-uuid-here',
+        stock: 100,
+        sku: 'SAMPLE-001',
+        images: 'https://example.com/image1.jpg,https://example.com/image2.jpg',
+        sizes: 'S,M,L,XL',
+        min_order_quantity: 1
+      }
+    ]
 
-  if (!isAdminUser) {
-    return null
+    const csv = Papa.unparse(template)
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'product-import-template.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,116 +137,203 @@ export default function BulkImportPage() {
 
     Papa.parse(file, {
       header: true,
+      skipEmptyLines: true,
       complete: (results) => {
-        const validData = results.data.filter((row: any) => 
-          row.name_en && row.price
-        ) as CSVProduct[]
-        setCsvData(validData)
-        setImportResult(null)
+        const data = results.data as CSVProduct[]
+        setCsvData(data)
+        setCurrentStep('validate')
+        validateData(data)
       },
       error: (error) => {
-        console.error('Error parsing CSV:', error)
-        alert('Error parsing CSV file')
+        console.error('CSV parsing error:', error)
+        alert(locale === 'ka' ? 'CSV ფაილის წაკითხვის შეცდომა' : 'Error parsing CSV file')
       }
     })
   }
 
-  const downloadTemplate = () => {
-    const template = [
-      {
-        name_en: 'Example Product',
-        name_ka: 'მაგალითი პროდუქტი',
-        description_en: 'Product description in English',
-        description_ka: 'პროდუქტის აღწერა ქართულად',
-        price: 99.99,
-        currency: 'GEL',
-        category_id: 'category-id-here',
-        brand_id: 'brand-id-here',
-        stock: 100,
-        sku: 'PROD-001',
-        images: 'https://example.com/image1.jpg,https://example.com/image2.jpg',
-        sizes: 'S,M,L,XL',
-        min_order_quantity: 1
-      }
-    ]
+  const validateData = async (data: CSVProduct[]) => {
+    setValidating(true)
+    const errors: ValidationError[] = []
     
-    const csv = Papa.unparse(template)
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'products_template.csv'
-    a.click()
-    window.URL.revokeObjectURL(url)
+    data.forEach((row, index) => {
+      const rowNum = index + 1
+
+      // Required field validation
+      if (!row.name_en?.trim()) {
+        errors.push({
+          row: rowNum,
+          field: 'name_en',
+          message: 'English name is required',
+          severity: 'error'
+        })
+      }
+
+      if (!row.name_ka?.trim()) {
+        errors.push({
+          row: rowNum,
+          field: 'name_ka',
+          message: 'Georgian name is required',
+          severity: 'error'
+        })
+      }
+
+      if (!row.price || row.price <= 0) {
+        errors.push({
+          row: rowNum,
+          field: 'price',
+          message: 'Valid price is required',
+          severity: 'error'
+        })
+      }
+
+      if (!row.sku?.trim()) {
+        errors.push({
+          row: rowNum,
+          field: 'sku',
+          message: 'SKU is required',
+          severity: 'error'
+        })
+      }
+
+      // Category validation
+      if (row.category_id && !categories.find(c => c.id === row.category_id)) {
+        errors.push({
+          row: rowNum,
+          field: 'category_id',
+          message: 'Invalid category ID',
+          severity: 'warning'
+        })
+      }
+
+      // Brand validation
+      if (row.brand_id && !brands.find(b => b.id === row.brand_id)) {
+        errors.push({
+          row: rowNum,
+          field: 'brand_id',
+          message: 'Invalid brand ID',
+          severity: 'warning'
+        })
+      }
+
+      // Stock validation
+      if (row.stock < 0) {
+        errors.push({
+          row: rowNum,
+          field: 'stock',
+          message: 'Stock cannot be negative',
+          severity: 'warning'
+        })
+      }
+    })
+
+    setValidationErrors(errors)
+    setValidating(false)
+    
+    if (errors.filter(e => e.severity === 'error').length === 0) {
+      setCurrentStep('preview')
+    }
   }
 
   const importProducts = async () => {
-    if (csvData.length === 0) return
+    if (!csvData.length) return
 
     setImporting(true)
-    const result: ImportResult = { success: 0, failed: 0, errors: [] }
-
-    for (const product of csvData) {
-      try {
-        // Validate required fields (Georgian name is optional)
-        if (!product.name_en || !product.price) {
-          result.failed++
-          result.errors.push(`Missing required fields for product: ${product.name_en || 'Unknown'}`)
-          continue
-        }
-
-        // Process images array
-        const images = product.images ? product.images.split(',').map(img => img.trim()) : []
-        
-        // Process sizes array
-        const sizes = product.sizes ? product.sizes.split(',').map(size => size.trim()) : []
-
-        const productData = {
-          name_en: product.name_en,
-          name_ka: product.name_ka,
-          description_en: product.description_en || '',
-          description_ka: product.description_ka || '',
-          price: parseFloat(product.price.toString()),
-          currency: product.currency || 'GEL',
-          category_id: product.category_id || null,
-          brand_id: product.brand_id || null,
-          stock: parseInt(product.stock?.toString() || '0'),
-          sku: product.sku || `PROD-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-          images: images,
-          sizes: sizes,
-          min_order_quantity: parseInt(product.min_order_quantity?.toString() || '1'),
-          is_active: true,
-          is_featured: false
-        }
-
-        const { error } = await supabase
-          .from('products')
-          .insert([productData])
-
-        if (error) {
-          result.failed++
-          result.errors.push(`Failed to import ${product.name_en}: ${error.message}`)
-        } else {
-          result.success++
-        }
-      } catch (error) {
-        result.failed++
-        result.errors.push(`Error processing ${product.name_en}: ${error}`)
-      }
+    setImportProgress(0)
+    setCurrentStep('import')
+    
+    const results: ImportResult = {
+      success: 0,
+      failed: 0,
+      errors: [],
+      warnings: [],
+      skipped: 0
     }
 
-    setImportResult(result)
-    setImporting(false)
-    
-    if (result.success > 0) {
-      setCsvData([]) // Clear the data on successful import
+    try {
+      for (let i = 0; i < csvData.length; i++) {
+        const product = csvData[i]
+        setImportProgress(((i + 1) / csvData.length) * 100)
+
+        try {
+          // Check if product with same SKU exists
+          const { data: existingProduct } = await supabase
+            .from('products')
+            .select('id')
+            .eq('sku', product.sku)
+            .single()
+
+          if (existingProduct) {
+            results.skipped++
+            results.warnings.push(`Row ${i + 1}: Product with SKU ${product.sku} already exists`)
+            continue
+          }
+
+          // Prepare product data
+          const productData = {
+            name_en: product.name_en,
+            name_ka: product.name_ka,
+            description_en: product.description_en || '',
+            description_ka: product.description_ka || '',
+            price: parseFloat(product.price.toString()),
+            currency: product.currency || 'GEL',
+            category_id: product.category_id || null,
+            brand_id: product.brand_id || null,
+            stock: parseInt(product.stock.toString()) || 0,
+            sku: product.sku,
+            images: product.images ? product.images.split(',').map(img => img.trim()) : [],
+            sizes: product.sizes ? product.sizes.split(',').map(size => size.trim()) : [],
+            min_order_quantity: parseInt(product.min_order_quantity?.toString()) || 1,
+            is_active: true,
+            is_featured: false,
+            is_new_arrival: false,
+            is_bestseller: false
+          }
+
+          const { error } = await supabase
+            .from('products')
+            .insert([productData])
+
+          if (error) {
+            results.failed++
+            results.errors.push(`Row ${i + 1}: ${error.message}`)
+          } else {
+            results.success++
+          }
+        } catch (error) {
+          results.failed++
+          results.errors.push(`Row ${i + 1}: ${error}`)
+        }
+
+        // Small delay to prevent overwhelming the database
+        if (i % 10 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+      }
+    } catch (error) {
+      console.error('Import error:', error)
+    } finally {
+      setImportResult(results)
+      setImporting(false)
+      setImportProgress(100)
+      setCurrentStep('complete')
+    }
+  }
+
+  const resetImport = () => {
+    setCsvData([])
+    setImportResult(null)
+    setValidationErrors([])
+    setImportProgress(0)
+    setCurrentStep('upload')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
   if (adminLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-600"></div>
       </div>
     )
   }
@@ -204,280 +343,441 @@ export default function BulkImportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full opacity-20 blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full opacity-15 blur-xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <Link href="/admin/products" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {locale === 'ka' ? 'პროდუქტების მართვაში დაბრუნება' : 'Back to Products'}
-          </Link>
-
-          <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-blue-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {locale === 'ka' ? 'ბულკ იმპორტი' : 'Bulk Product Import'}
-            </h1>
-            <p className="text-gray-600">
-              {locale === 'ka' 
-                ? 'CSV ფაილის საშუალებით მრავალი პროდუქტის ერთდროული დამატება' 
-                : 'Import multiple products at once using a CSV file'
-              }
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Instructions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200"
-        >
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {locale === 'ka' ? 'ინსტრუქციები' : 'Instructions'}
-          </h2>
-          <div className="space-y-3 text-sm text-gray-600">
-            <div className="flex items-start">
-              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-blue-600 font-semibold text-xs">1</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Link href="/admin/products" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {locale === 'ka' ? 'ბალკ იმპორტი' : 'Bulk Import'}
+                </h1>
+                <p className="text-sm text-gray-600">
+                  {locale === 'ka' ? 'CSV ფაილიდან პროდუქტების იმპორტი' : 'Import products from CSV file'}
+                </p>
               </div>
-              <p>{locale === 'ka' ? 'ჩამოტვირთეთ CSV შაბლონი ქვემოთ მოცემული ღილაკის დახმარებით' : 'Download the CSV template using the button below'}</p>
-            </div>
-            <div className="flex items-start">
-              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-blue-600 font-semibold text-xs">2</span>
-              </div>
-              <p>{locale === 'ka' ? 'შეავსეთ შაბლონი თქვენი პროდუქტების მონაცემებით' : 'Fill the template with your product data'}</p>
-            </div>
-            <div className="flex items-start">
-              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-blue-600 font-semibold text-xs">3</span>
-              </div>
-              <p>{locale === 'ka' ? 'ატვირთეთ შევსებული CSV ფაილი' : 'Upload the completed CSV file'}</p>
-            </div>
-            <div className="flex items-start">
-              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-blue-600 font-semibold text-xs">4</span>
-              </div>
-              <p>{locale === 'ka' ? 'დააჭირეთ იმპორტის ღილაკს' : 'Click the import button'}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Download Template */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200"
-        >
-          <div className="text-center">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {locale === 'ka' ? 'CSV შაბლონი' : 'CSV Template'}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              {locale === 'ka' 
-                ? 'ჩამოტვირთეთ შაბლონი სწორი ფორმატის გასაგებად' 
-                : 'Download the template to understand the correct format'
-              }
-            </p>
-            <button
-              onClick={downloadTemplate}
-              className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2 mx-auto"
-            >
-              <Download className="w-5 h-5" />
-              <span>{locale === 'ka' ? 'შაბლონის ჩამოტვირთვა' : 'Download Template'}</span>
-            </button>
-          </div>
-        </motion.div>
-
-        {/* File Upload */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200"
-        >
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {locale === 'ka' ? 'CSV ფაილის ატვირთვა' : 'Upload CSV File'}
-          </h3>
-          
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">
-              {locale === 'ka' 
-                ? 'აირჩიეთ CSV ფაილი ან გადაიტანეთ აქ' 
-                : 'Choose a CSV file or drag and drop here'
-              }
-            </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {locale === 'ka' ? 'ფაილის არჩევა' : 'Choose File'}
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Preview Data */}
-        {csvData.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {locale === 'ka' ? 'მონაცემების წინასწარი ნახვა' : 'Data Preview'}
-              </h3>
-              <span className="text-sm text-gray-600">
-                {csvData.length} {locale === 'ka' ? 'პროდუქტი' : 'products'}
-              </span>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      {locale === 'ka' ? 'სახელი (EN)' : 'Name (EN)'}
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      {locale === 'ka' ? 'სახელი (KA)' : 'Name (KA)'}
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      {locale === 'ka' ? 'ფასი' : 'Price'}
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                      {locale === 'ka' ? 'მარაგი' : 'Stock'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {csvData.slice(0, 5).map((product, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-2 text-sm text-gray-900">{product.name_en}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{product.name_ka}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{product.price} {product.currency}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{product.stock}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {csvData.length > 5 && (
-                <p className="text-sm text-gray-500 mt-2 text-center">
-                  {locale === 'ka' ? `და კიდევ ${csvData.length - 5} პროდუქტი...` : `and ${csvData.length - 5} more products...`}
-                </p>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={downloadTemplate}
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>{locale === 'ka' ? 'შაბლონი' : 'Template'}</span>
+              </button>
+              
+              {currentStep !== 'upload' && (
+                <button
+                  onClick={resetImport}
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>{locale === 'ka' ? 'თავიდან დაწყება' : 'Start Over'}</span>
+                </button>
               )}
             </div>
-            
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={importProducts}
-                disabled={importing}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Package className="w-5 h-5" />
-                <span>
-                  {importing 
-                    ? (locale === 'ka' ? 'იმპორტირება...' : 'Importing...') 
-                    : (locale === 'ka' ? 'პროდუქტების იმპორტი' : 'Import Products')
-                  }
-                </span>
-              </button>
-            </div>
-          </motion.div>
-        )}
+          </div>
+        </div>
+      </div>
 
-        {/* Import Results */}
-        {importResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {locale === 'ka' ? 'იმპორტის შედეგები' : 'Import Results'}
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="bg-green-50 rounded-lg p-4">
-                <div className="flex items-center">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-green-600">
-                      {locale === 'ka' ? 'წარმატებული' : 'Successful'}
-                    </p>
-                    <p className="text-2xl font-bold text-green-900">{importResult.success}</p>
-                  </div>
-                </div>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            {[
+              { key: 'upload', label: locale === 'ka' ? 'ატვირთვა' : 'Upload', icon: Upload },
+              { key: 'validate', label: locale === 'ka' ? 'ვალიდაცია' : 'Validate', icon: CheckCircle },
+              { key: 'preview', label: locale === 'ka' ? 'გადახედვა' : 'Preview', icon: Eye },
+              { key: 'import', label: locale === 'ka' ? 'იმპორტი' : 'Import', icon: Play },
+              { key: 'complete', label: locale === 'ka' ? 'დასრულება' : 'Complete', icon: Target }
+            ].map((step, index) => {
+              const IconComponent = step.icon
+              const isActive = currentStep === step.key
+              const isCompleted = ['upload', 'validate', 'preview', 'import'].indexOf(step.key) < ['upload', 'validate', 'preview', 'import', 'complete'].indexOf(currentStep)
               
-              <div className="bg-red-50 rounded-lg p-4">
-                <div className="flex items-center">
-                  <X className="w-8 h-8 text-red-600" />
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-red-600">
-                      {locale === 'ka' ? 'ვერ მოხერხდა' : 'Failed'}
-                    </p>
-                    <p className="text-2xl font-bold text-red-900">{importResult.failed}</p>
+              return (
+                <div key={step.key} className="flex items-center">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    isActive 
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
+                      : isCompleted
+                      ? 'border-emerald-500 bg-emerald-500 text-white'
+                      : 'border-gray-300 bg-white text-gray-400'
+                  }`}>
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                  <span className={`ml-2 text-sm font-medium ${
+                    isActive ? 'text-emerald-600' : isCompleted ? 'text-emerald-600' : 'text-gray-500'
+                  }`}>
+                    {step.label}
+                  </span>
+                  {index < 4 && (
+                    <div className={`w-16 h-0.5 mx-4 ${
+                      isCompleted ? 'bg-emerald-500' : 'bg-gray-300'
+                    }`} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {/* Upload Step */}
+          {currentStep === 'upload' && (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-8"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                  <Upload className="w-12 h-12 text-emerald-500" />
+                </div>
+                
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {locale === 'ka' ? 'CSV ფაილის ატვირთვა' : 'Upload CSV File'}
+                </h2>
+                
+                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                  {locale === 'ka' 
+                    ? 'აირჩიეთ CSV ფაილი პროდუქტების ბალკ იმპორტისთვის. დარწმუნდით, რომ ფაილი შეესაბამება ჩვენს შაბლონს.'
+                    : 'Choose a CSV file to bulk import products. Make sure your file follows our template format.'
+                  }
+                </p>
+
+                <div className="max-w-md mx-auto">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <FileText className="w-8 h-8 mb-3 text-gray-400" />
+                      <p className="text-sm text-gray-500">
+                        <span className="font-semibold">
+                          {locale === 'ka' ? 'დააჭირეთ ატვირთვისთვის' : 'Click to upload'}
+                        </span>
+                      </p>
+                      <p className="text-xs text-gray-500">CSV files only</p>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <Info className="w-5 h-5 text-blue-500 mt-0.5" />
+                    <div className="text-left">
+                      <h4 className="font-medium text-blue-900 mb-2">
+                        {locale === 'ka' ? 'მნიშვნელოვანი ინფორმაცია' : 'Important Information'}
+                      </h4>
+                      <ul className="text-sm text-blue-800 space-y-1">
+                        <li>• {locale === 'ka' ? 'გამოიყენეთ მხოლოდ CSV ფორმატი' : 'Use CSV format only'}</li>
+                        <li>• {locale === 'ka' ? 'ჩამოტვირთეთ შაბლონი სწორი ფორმატისთვის' : 'Download template for correct format'}</li>
+                        <li>• {locale === 'ka' ? 'დარწმუნდით, რომ SKU უნიკალურია' : 'Ensure SKUs are unique'}</li>
+                        <li>• {locale === 'ka' ? 'სურათების URL-ები უნდა იყოს ვალიდური' : 'Image URLs must be valid'}</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {importResult.errors.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">
-                  {locale === 'ka' ? 'შეცდომები:' : 'Errors:'}
-                </h4>
-                <div className="bg-red-50 rounded-lg p-3 max-h-40 overflow-y-auto">
-                  {importResult.errors.map((error, index) => (
-                    <p key={index} className="text-sm text-red-700 mb-1">
-                      {error}
+            </motion.div>
+          )}
+
+          {/* Validation Step */}
+          {currentStep === 'validate' && (
+            <motion.div
+              key="validate"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-8"
+            >
+              <div className="text-center mb-8">
+                <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                  {validating ? (
+                    <RefreshCw className="w-12 h-12 text-blue-500 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-12 h-12 text-blue-500" />
+                  )}
+                </div>
+                
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {locale === 'ka' ? 'მონაცემების ვალიდაცია' : 'Data Validation'}
+                </h2>
+                
+                {validating ? (
+                  <p className="text-gray-600">
+                    {locale === 'ka' ? 'მონაცემების შემოწმება...' : 'Validating your data...'}
+                  </p>
+                ) : (
+                  <p className="text-gray-600">
+                    {locale === 'ka' ? 'ვალიდაცია დასრულდა' : 'Validation completed'}
+                  </p>
+                )}
+              </div>
+
+              {!validating && validationErrors.length > 0 && (
+                <div className="mb-8">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div className="flex items-center mb-4">
+                      <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                      <h3 className="font-semibold text-red-800">
+                        {locale === 'ka' ? 'ვალიდაციის შეცდომები' : 'Validation Errors'}
+                      </h3>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {validationErrors.map((error, index) => (
+                        <div key={index} className={`text-sm p-2 rounded ${
+                          error.severity === 'error' 
+                            ? 'bg-red-100 text-red-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          <strong>Row {error.row}, {error.field}:</strong> {error.message}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!validating && validationErrors.filter(e => e.severity === 'error').length === 0 && (
+                <div className="text-center">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6">
+                    <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+                    <p className="text-emerald-800 font-medium">
+                      {locale === 'ka' ? 'ვალიდაცია წარმატებით დასრულდა!' : 'Validation passed successfully!'}
                     </p>
-                  ))}
+                    <p className="text-emerald-700 text-sm mt-2">
+                      {csvData.length} {locale === 'ka' ? 'პროდუქტი მზადაა იმპორტისთვის' : 'products ready for import'}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => setCurrentStep('preview')}
+                    className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                  >
+                    {locale === 'ka' ? 'გადახედვა' : 'Preview Data'}
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Preview Step */}
+          {currentStep === 'preview' && (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-8"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {locale === 'ka' ? 'მონაცემების გადახედვა' : 'Data Preview'}
+                </h2>
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-600">
+                    {csvData.length} {locale === 'ka' ? 'პროდუქტი' : 'products'}
+                  </span>
+                  <button
+                    onClick={importProducts}
+                    disabled={importing}
+                    className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
+                  >
+                    <Play className="w-4 h-4" />
+                    <span>{locale === 'ka' ? 'იმპორტის დაწყება' : 'Start Import'}</span>
+                  </button>
                 </div>
               </div>
-            )}
-            
-            {importResult.success > 0 && (
-              <div className="mt-4 text-center">
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        {locale === 'ka' ? 'სახელი' : 'Name'}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        {locale === 'ka' ? 'ფასი' : 'Price'}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        {locale === 'ka' ? 'მარაგი' : 'Stock'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {csvData.slice(0, 10).map((product, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          {locale === 'ka' ? product.name_ka : product.name_en}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          {product.price} {product.currency || 'GEL'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{product.sku}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{product.stock}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {csvData.length > 10 && (
+                  <div className="text-center py-4 text-sm text-gray-500">
+                    {locale === 'ka' ? 'და კიდევ' : 'and'} {csvData.length - 10} {locale === 'ka' ? 'მეტი...' : 'more...'}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Import Step */}
+          {currentStep === 'import' && (
+            <motion.div
+              key="import"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-8"
+            >
+              <div className="text-center">
+                <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                  <Zap className="w-12 h-12 text-blue-500" />
+                </div>
+                
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {locale === 'ka' ? 'პროდუქტების იმპორტი' : 'Importing Products'}
+                </h2>
+                
+                <p className="text-gray-600 mb-8">
+                  {locale === 'ka' ? 'გთხოვთ მოიცადოთ...' : 'Please wait while we import your products...'}
+                </p>
+
+                <div className="max-w-md mx-auto mb-6">
+                  <div className="bg-gray-200 rounded-full h-4">
+                    <div 
+                      className="bg-emerald-500 h-4 rounded-full transition-all duration-300"
+                      style={{ width: `${importProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {Math.round(importProgress)}% {locale === 'ka' ? 'დასრულდა' : 'complete'}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Complete Step */}
+          {currentStep === 'complete' && importResult && (
+            <motion.div
+              key="complete"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-8"
+            >
+              <div className="text-center mb-8">
+                <div className="mx-auto w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                  <CheckCircle className="w-12 h-12 text-emerald-500" />
+                </div>
+                
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {locale === 'ka' ? 'იმპორტი დასრულდა!' : 'Import Complete!'}
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-emerald-50 rounded-lg p-6 text-center">
+                  <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+                  <p className="text-2xl font-bold text-emerald-600">{importResult.success}</p>
+                  <p className="text-sm text-emerald-700">
+                    {locale === 'ka' ? 'წარმატებული' : 'Successful'}
+                  </p>
+                </div>
+                
+                <div className="bg-red-50 rounded-lg p-6 text-center">
+                  <X className="w-8 h-8 text-red-500 mx-auto mb-3" />
+                  <p className="text-2xl font-bold text-red-600">{importResult.failed}</p>
+                  <p className="text-sm text-red-700">
+                    {locale === 'ka' ? 'წარუმატებელი' : 'Failed'}
+                  </p>
+                </div>
+                
+                <div className="bg-amber-50 rounded-lg p-6 text-center">
+                  <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-3" />
+                  <p className="text-2xl font-bold text-amber-600">{importResult.skipped}</p>
+                  <p className="text-sm text-amber-700">
+                    {locale === 'ka' ? 'გამოტოვებული' : 'Skipped'}
+                  </p>
+                </div>
+              </div>
+
+              {(importResult.errors.length > 0 || importResult.warnings.length > 0) && (
+                <div className="space-y-4 mb-8">
+                  {importResult.errors.length > 0 && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <h4 className="font-medium text-red-800 mb-2">
+                        {locale === 'ka' ? 'შეცდომები' : 'Errors'}
+                      </h4>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {importResult.errors.map((error, index) => (
+                          <p key={index} className="text-sm text-red-700">{error}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {importResult.warnings.length > 0 && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <h4 className="font-medium text-amber-800 mb-2">
+                        {locale === 'ka' ? 'გაფრთხილებები' : 'Warnings'}
+                      </h4>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {importResult.warnings.map((warning, index) => (
+                          <p key={index} className="text-sm text-amber-700">{warning}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-center space-x-4">
                 <Link
                   href="/admin/products"
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center space-x-2"
+                  className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
                 >
-                  <Package className="w-5 h-5" />
-                  <span>{locale === 'ka' ? 'პროდუქტების ნახვა' : 'View Products'}</span>
+                  {locale === 'ka' ? 'პროდუქტების ნახვა' : 'View Products'}
                 </Link>
+                
+                <button
+                  onClick={resetImport}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  {locale === 'ka' ? 'ახალი იმპორტი' : 'New Import'}
+                </button>
               </div>
-            )}
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
