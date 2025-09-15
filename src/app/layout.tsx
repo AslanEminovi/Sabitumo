@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { Navbar } from '@/components/Navbar'
+import { NavbarNew as Navbar } from '@/components/NavbarNew'
 import { Footer } from '@/components/Footer'
 import { CartProvider } from '@/context/CartContext'
 import { TranslationProvider } from '@/context/TranslationContext'
