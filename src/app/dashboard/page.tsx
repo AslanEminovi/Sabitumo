@@ -431,15 +431,17 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Link 
                 href="/analytics"
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
-                  <TrendingUp className="w-8 h-8" />
+                  <div className="p-3 bg-emerald-100 rounded-full">
+                    <TrendingUp className="w-6 h-6 text-emerald-600" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold">
+                    <h3 className="font-semibold text-gray-900">
                       {locale === 'ka' ? 'ანალიტიკა' : 'Analytics'}
                     </h3>
-                    <p className="text-sm opacity-90">
+                    <p className="text-sm text-gray-600">
                       {locale === 'ka' ? 'ხარჯების ანალიზი' : 'View spending insights'}
                     </p>
                   </div>
@@ -448,15 +450,17 @@ export default function DashboardPage() {
 
               <Link 
                 href="/orders"
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
-                  <ShoppingCart className="w-8 h-8" />
+                  <div className="p-3 bg-emerald-100 rounded-full">
+                    <ShoppingCart className="w-6 h-6 text-emerald-600" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold">
+                    <h3 className="font-semibold text-gray-900">
                       {locale === 'ka' ? 'შეკვეთები' : 'Orders'}
                     </h3>
-                    <p className="text-sm opacity-90">
+                    <p className="text-sm text-gray-600">
                       {locale === 'ka' ? 'შეკვეთების ისტორია' : 'Order history'}
                     </p>
                   </div>
@@ -465,15 +469,17 @@ export default function DashboardPage() {
 
               <Link 
                 href="/profile"
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
-                  <User className="w-8 h-8" />
+                  <div className="p-3 bg-emerald-100 rounded-full">
+                    <User className="w-6 h-6 text-emerald-600" />
+                  </div>
                   <div>
-                    <h3 className="font-semibold">
+                    <h3 className="font-semibold text-gray-900">
                       {locale === 'ka' ? 'პროფილი' : 'Profile'}
                     </h3>
-                    <p className="text-sm opacity-90">
+                    <p className="text-sm text-gray-600">
                       {locale === 'ka' ? 'პროფილის მართვა' : 'Manage profile'}
                     </p>
                   </div>
