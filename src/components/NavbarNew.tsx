@@ -127,7 +127,7 @@ export function NavbarNew() {
               <img 
                 src="/sabitumo1.png" 
                 alt="Sabitumo Logo" 
-                className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 hover:border-emerald-300 transition-colors duration-150"
+                className="h-8 w-8 object-cover rounded-full border-2 border-gray-200 hover:border-emerald-300 transition-colors duration-150"
               />
               <span className="hidden sm:block text-lg font-bold text-primary-900">Sabitumo</span>
             </Link>
