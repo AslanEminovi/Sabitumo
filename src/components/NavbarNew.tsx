@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/hooks/useTranslation'
-import { ShoppingCart, Menu, X, User, ChevronDown, LogOut, Settings as SettingsIcon, Package } from 'lucide-react'
+import { ShoppingCart, Menu, X, User, ChevronDown, LogOut, Settings as SettingsIcon, Package, Shield } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useIsAdmin } from '@/lib/admin'
@@ -299,6 +299,14 @@ export function NavbarNew() {
                         <SettingsIcon className="w-4 h-4" />
                         <span>{locale === 'ka' ? 'პარამეტრები' : 'Settings'}</span>
                       </Link>
+
+                      {/* Admin Panel Link for all users who have admin access */}
+                      {isAdminUser && (
+                        <Link href="/admin" className="w-full flex items-center space-x-3 px-6 py-3 text-sm text-amber-700 hover:bg-amber-50 transition-all duration-200">
+                          <Shield className="w-4 h-4" />
+                          <span>{locale === 'ka' ? 'ადმინ პანელი' : 'Admin Panel'}</span>
+                        </Link>
+                      )}
 
                       {/* Admin Section */}
                       {isAdminUser && (

@@ -398,16 +398,16 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -436,7 +436,7 @@ export default function ProfilePage() {
               
               <Link
                 href="/settings"
-                className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 <span>{locale === 'ka' ? 'პარამეტრები' : 'Settings'}</span>
@@ -459,7 +459,7 @@ export default function ProfilePage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
                       activeTab === tab.id
-                        ? 'border-emerald-500 text-emerald-600'
+                        ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
@@ -485,7 +485,7 @@ export default function ProfilePage() {
               >
                 <div className="text-center mb-6">
                   <div className="relative mx-auto w-24 h-24 mb-4">
-                    <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center">
                       {profileData.avatar_url ? (
                         <img 
                           src={profileData.avatar_url} 
@@ -509,8 +509,8 @@ export default function ProfilePage() {
                   </h2>
                   <p className="text-gray-600 mb-2">{profileData.email}</p>
                   <div className="flex items-center justify-center">
-                    <Award className="w-4 h-4 text-emerald-500 mr-1" />
-                    <span className="text-emerald-600 font-medium">
+                    <Award className="w-4 h-4 text-blue-500 mr-1" />
+                    <span className="text-blue-600 font-medium">
                       {locale === 'ka' ? 'ვერიფიცირებული წევრი' : 'Verified Member'}
                     </span>
                   </div>
@@ -518,11 +518,11 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-center space-x-4 text-sm mt-4">
                     <div className="flex items-center space-x-1">
                       {profileData.email_verified ? (
-                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                        <CheckCircle className="w-4 h-4 text-green-500" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-amber-500" />
                       )}
-                      <span className={profileData.email_verified ? 'text-emerald-600' : 'text-amber-600'}>
+                      <span className={profileData.email_verified ? 'text-green-600' : 'text-amber-600'}>
                         {locale === 'ka' ? 'ემაილი' : 'Email'}
                       </span>
                     </div>
@@ -530,11 +530,11 @@ export default function ProfilePage() {
                     {profileData.phone && (
                       <div className="flex items-center space-x-1">
                         {profileData.phone_verified ? (
-                          <CheckCircle className="w-4 h-4 text-emerald-500" />
+                          <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <AlertCircle className="w-4 h-4 text-amber-500" />
                         )}
-                        <span className={profileData.phone_verified ? 'text-emerald-600' : 'text-amber-600'}>
+                        <span className={profileData.phone_verified ? 'text-green-600' : 'text-amber-600'}>
                           {locale === 'ka' ? 'ტელეფონი' : 'Phone'}
                         </span>
                       </div>
@@ -544,44 +544,44 @@ export default function ProfilePage() {
 
                 {/* User Stats */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <ShoppingCart className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <ShoppingCart className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-emerald-900">{analytics.totalOrders}</p>
-                        <p className="text-xs text-emerald-700">
+                        <p className="text-sm font-medium text-blue-900">{analytics.totalOrders}</p>
+                        <p className="text-xs text-blue-700">
                           {locale === 'ka' ? 'შეკვეთები' : 'Orders'}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-5 h-5 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-blue-900">
+                        <p className="text-sm font-medium text-green-900">
                           {analytics.totalSpent.toLocaleString()} ₾
                         </p>
-                        <p className="text-xs text-blue-700">
+                        <p className="text-xs text-green-700">
                           {locale === 'ka' ? 'ჯამური ღირებულება' : 'Total Spent'}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <Package className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <Package className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-emerald-900">{analytics.totalOrders}</p>
-                        <p className="text-xs text-emerald-700">
+                        <p className="text-sm font-medium text-indigo-900">{analytics.totalOrders}</p>
+                        <p className="text-xs text-indigo-700">
                           {locale === 'ka' ? 'მთლიანი შეკვეთები' : 'Total Orders'}
                         </p>
                       </div>
