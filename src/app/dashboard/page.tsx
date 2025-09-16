@@ -431,7 +431,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Link 
                 href="/analytics"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
                   <TrendingUp className="w-8 h-8" />
@@ -448,7 +448,7 @@ export default function DashboardPage() {
 
               <Link 
                 href="/orders"
-                className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
                   <ShoppingCart className="w-8 h-8" />
@@ -465,7 +465,7 @@ export default function DashboardPage() {
 
               <Link 
                 href="/profile"
-                className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200"
               >
                 <div className="flex items-center space-x-4">
                   <User className="w-8 h-8" />

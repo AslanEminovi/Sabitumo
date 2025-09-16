@@ -391,7 +391,6 @@ export default function ProfilePage() {
 
   const tabs = [
     { id: 'profile', label: locale === 'ka' ? 'პროფილი' : 'Profile', icon: User },
-    { id: 'orders', label: locale === 'ka' ? 'შეკვეთები' : 'Orders', icon: ShoppingCart },
     { id: 'activity', label: locale === 'ka' ? 'აქტივობა' : 'Activity', icon: Activity }
   ]
 
@@ -424,6 +423,14 @@ export default function ProfilePage() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <Link
+                href="/orders"
+                className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>{locale === 'ka' ? 'ჩემი შეკვეთები' : 'My Orders'}</span>
+              </Link>
+              
               <Link
                 href="/analytics"
                 className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -799,92 +806,6 @@ export default function ProfilePage() {
         )}
 
 
-        {/* Orders Tab */}
-        {activeTab === 'orders' && (
-          <div className="space-y-8">
-            {/* Order Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50 text-center"
-              >
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-6 h-6 text-emerald-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{analytics.completedOrders}</p>
-                <p className="text-sm text-gray-600">{locale === 'ka' ? 'დასრულებული' : 'Completed'}</p>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50 text-center"
-              >
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-6 h-6 text-amber-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{analytics.pendingOrders}</p>
-                <p className="text-sm text-gray-600">{locale === 'ka' ? 'მომლოდინე' : 'Pending'}</p>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50 text-center"
-              >
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <X className="w-6 h-6 text-red-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{analytics.cancelledOrders}</p>
-                <p className="text-sm text-gray-600">{locale === 'ka' ? 'გაუქმებული' : 'Cancelled'}</p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50 text-center"
-              >
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ShoppingCart className="w-6 h-6 text-blue-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{analytics.totalOrders}</p>
-                <p className="text-sm text-gray-600">{locale === 'ka' ? 'ჯამური' : 'Total'}</p>
-              </motion.div>
-            </div>
-
-            {/* Order History Link */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6"
-            >
-              <div className="text-center">
-                <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {locale === 'ka' ? 'შეკვეთების ისტორია' : 'Order History'}
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  {locale === 'ka' 
-                    ? 'ნახეთ თქვენი ყველა შეკვეთის დეტალური ინფორმაცია'
-                    : 'View detailed information about all your orders'
-                  }
-                </p>
-                <Link
-                  href="/orders"
-                  className="inline-flex items-center px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
-                >
-                  {locale === 'ka' ? 'შეკვეთების ნახვა' : 'View Orders'}
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
 
         {/* Activity Tab */}
         {activeTab === 'activity' && (
