@@ -43,9 +43,9 @@ export const LazyBrandsDropdown = dynamic(
   }
 )
 
-// Lazy load analytics components (heavy with charts)
+// Lazy load analytics components (placeholder for future charts)
 export const LazyAnalyticsChart = dynamic(
-  () => import('react-chartjs-2').then(mod => mod.Line),
+  () => Promise.resolve(() => <div className="h-64 bg-gray-100 rounded flex items-center justify-center text-gray-500">Chart Component</div>),
   {
     loading: () => <div className="h-64 bg-gray-100 rounded animate-pulse"></div>,
     ssr: false,
