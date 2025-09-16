@@ -272,9 +272,9 @@ function ShopPageContent() {
 
         {/* Enhanced Filters and Controls */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
           className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8 border border-white/20"
         >
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
@@ -347,9 +347,9 @@ function ShopPageContent() {
 
         {/* Products Grid/List */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         >
           {currentProducts.length === 0 ? (
             <motion.div
@@ -397,16 +397,27 @@ function ShopPageContent() {
               ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6'
               : 'space-y-6'
             }>
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence mode="popLayout" initial={false}>
                 {currentProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.4, delay: 0.05 * index }}
-                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: Math.min(0.02 * index, 0.3),
+                      ease: "easeOut"
+                    }}
+                    whileHover={{ 
+                      y: -4, 
+                      scale: 1.02,
+                      transition: { 
+                        duration: 0.3, 
+                        ease: "easeOut" 
+                      } 
+                    }}
                     className={`group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 ${
                       viewMode === 'list' ? 'flex' : 'flex flex-col h-full'
                     }`}
@@ -510,8 +521,9 @@ function ShopPageContent() {
                           {/* NEW Badge - Priority 1 */}
                           {product.is_new_arrival && (
                             <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
                               className="inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-medium rounded-full shadow-lg"
                             >
                               <Sparkles className="w-2.5 h-2.5 mr-0.5" />
@@ -522,8 +534,9 @@ function ShopPageContent() {
                           {/* BESTSELLER Badge - Priority 2 */}
                           {product.is_bestseller && (
                             <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: 0.4, duration: 0.4, ease: "easeOut" }}
                               className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-medium rounded-full shadow-lg"
                             >
                               <Star className="w-3 h-3 mr-1 fill-current" />
@@ -795,9 +808,9 @@ function ShopPageContent() {
           {/* Enhanced Pagination */}
           {totalPages > 1 && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
               className="flex justify-center items-center space-x-2 mt-12"
             >
               <motion.button
