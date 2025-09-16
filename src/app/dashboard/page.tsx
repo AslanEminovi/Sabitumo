@@ -271,7 +271,6 @@ export default function DashboardPage() {
   const tabs = [
     { id: 'overview', label: locale === 'ka' ? 'მიმოხილვა' : 'Overview', icon: BarChart3 },
     { id: 'orders', label: locale === 'ka' ? 'შეკვეთები' : 'Orders', icon: ShoppingCart },
-    { id: 'analytics', label: locale === 'ka' ? 'ანალიტიკა' : 'Analytics', icon: TrendingUp },
     { id: 'profile', label: locale === 'ka' ? 'პროფილი' : 'Profile', icon: User }
   ]
 
@@ -428,6 +427,60 @@ export default function DashboardPage() {
               </motion.div>
             </div>
 
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Link 
+                href="/analytics"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+              >
+                <div className="flex items-center space-x-4">
+                  <TrendingUp className="w-8 h-8" />
+                  <div>
+                    <h3 className="font-semibold">
+                      {locale === 'ka' ? 'ანალიტიკა' : 'Analytics'}
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      {locale === 'ka' ? 'ხარჯების ანალიზი' : 'View spending insights'}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link 
+                href="/orders"
+                className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white hover:from-green-600 hover:to-green-700 transition-all duration-200"
+              >
+                <div className="flex items-center space-x-4">
+                  <ShoppingCart className="w-8 h-8" />
+                  <div>
+                    <h3 className="font-semibold">
+                      {locale === 'ka' ? 'შეკვეთები' : 'Orders'}
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      {locale === 'ka' ? 'შეკვეთების ისტორია' : 'Order history'}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link 
+                href="/profile"
+                className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
+              >
+                <div className="flex items-center space-x-4">
+                  <User className="w-8 h-8" />
+                  <div>
+                    <h3 className="font-semibold">
+                      {locale === 'ka' ? 'პროფილი' : 'Profile'}
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      {locale === 'ka' ? 'პროფილის მართვა' : 'Manage profile'}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
             {/* Recent Orders */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
               <div className="flex items-center justify-between mb-6">
@@ -478,76 +531,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {activeTab === 'analytics' && (
-          <div>
-            {/* Time Period Selector */}
-            <TimePeriodSelector 
-              selectedPeriod={selectedPeriod}
-              onPeriodChange={setSelectedPeriod}
-              locale={locale}
-            />
-
-            {/* Monthly Spending Chart */}
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {locale === 'ka' ? 'ხარჯების ტრენდი' : 'Spending Trend'}
-              </h3>
-              <div className="space-y-4">
-                {dashboardData.monthlySpending.length > 0 ? (
-                  dashboardData.monthlySpending.map((month, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600">
-                        {month.month}
-                      </span>
-                      <span className="text-sm text-gray-900">
-                        {month.amount.toFixed(2)} ₾
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-8">
-                    {locale === 'ka' ? 'მონაცემები არ არის' : 'No data available'}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Top Categories */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {locale === 'ka' ? 'ტოპ კატეგორიები' : 'Top Categories'}
-              </h3>
-              <div className="space-y-4">
-                {dashboardData.topCategories.length > 0 ? (
-                  dashboardData.topCategories.map((category, index) => (
-                    <div key={category.name} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-bold">
-                          {index + 1}
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {category.name}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {category.spending.toFixed(2)} ₾
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {category.orders} {locale === 'ka' ? 'შეკვეთა' : 'orders'}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-8">
-                    {locale === 'ka' ? 'მონაცემები არ არის' : 'No data available'}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {activeTab === 'orders' && (
           <div className="bg-white rounded-xl shadow-lg p-6">

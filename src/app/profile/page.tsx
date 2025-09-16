@@ -391,7 +391,6 @@ export default function ProfilePage() {
 
   const tabs = [
     { id: 'profile', label: locale === 'ka' ? 'პროფილი' : 'Profile', icon: User },
-    { id: 'analytics', label: locale === 'ka' ? 'ანალიტიკა' : 'Analytics', icon: BarChart3 },
     { id: 'orders', label: locale === 'ka' ? 'შეკვეთები' : 'Orders', icon: ShoppingCart },
     { id: 'activity', label: locale === 'ka' ? 'აქტივობა' : 'Activity', icon: Activity }
   ]
@@ -419,20 +418,19 @@ export default function ProfilePage() {
                   {locale === 'ka' ? 'ჩემი პროფილი' : 'My Profile'}
                 </h1>
                 <p className="text-sm text-gray-600">
-                  {locale === 'ka' ? 'პირადი ინფორმაციის მართვა და ანალიტიკა' : 'Manage your personal information and view analytics'}
+                  {locale === 'ka' ? 'პირადი ინფორმაციის მართვა' : 'Manage your personal information'}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => fetchUserAnalytics(user.id, user.created_at)}
-                disabled={refreshing}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              <Link
+                href="/analytics"
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                <span>{locale === 'ka' ? 'განახლება' : 'Refresh'}</span>
-              </button>
+                <BarChart3 className="w-4 h-4" />
+                <span>{locale === 'ka' ? 'ანალიტიკა' : 'Analytics'}</span>
+              </Link>
               
               <Link
                 href="/settings"
@@ -800,197 +798,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Analytics Tab */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-8">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {locale === 'ka' ? 'საშუალო შეკვეთა' : 'Avg Order Value'}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {analytics.averageOrderValue.toLocaleString()} ₾
-                    </p>
-                  </div>
-                  <div className="p-3 bg-emerald-50 rounded-full">
-                    <Target className="w-6 h-6 text-emerald-600" />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {locale === 'ka' ? 'თვიური ხარჯი' : 'Monthly Spending'}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {analytics.monthlySpending.toLocaleString()} ₾
-                    </p>
-                    <div className="flex items-center mt-1">
-                      {analytics.spendingTrend >= 0 ? (
-                        <TrendingUp className="w-4 h-4 text-emerald-500 mr-1" />
-                      ) : (
-                        <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
-                      )}
-                      <span className={`text-sm font-medium ${
-                        analytics.spendingTrend >= 0 ? 'text-emerald-600' : 'text-red-600'
-                      }`}>
-                        {Math.abs(analytics.spendingTrend).toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-full">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {locale === 'ka' ? 'შეკვეთების სიხშირე' : 'Order Frequency'}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {analytics.orderFrequency.toFixed(1)}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {locale === 'ka' ? 'თვეში' : 'per month'}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-purple-50 rounded-full">
-                    <Activity className="w-6 h-6 text-purple-600" />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {locale === 'ka' ? 'წევრობიდან' : 'Member Since'}
-                    </p>
-                    <p className="text-lg font-bold text-gray-900">
-                      {analytics.memberSince ? new Date(analytics.memberSince).toLocaleDateString() : 'N/A'}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {locale === 'ka' ? 'რეგისტრაციის თარიღი' : 'Registration date'}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-full">
-                    <Calendar className="w-6 h-6 text-blue-600" />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Spending Trends */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                {locale === 'ka' ? 'ხარჯების ტრენდი (ბოლო 12 თვე)' : 'Spending Trends (Last 12 Months)'}
-              </h3>
-              
-              <div className="space-y-3">
-                {analytics.monthlyTrends.map((month, index) => (
-                  <div key={month.month} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600 w-20">{month.month}</span>
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="flex-1 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
-                          style={{ 
-                            width: `${Math.max((month.spending / Math.max(...analytics.monthlyTrends.map(m => m.spending))) * 100, 2)}%` 
-                          }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-500 w-12 text-center">
-                        {month.orders}
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900 w-24 text-right">
-                        {month.spending.toLocaleString()} ₾
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Top Categories */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                {locale === 'ka' ? 'ყველაზე პოპულარული კატეგორიები' : 'Top Categories'}
-              </h3>
-              
-              <div className="space-y-4">
-                {analytics.topCategories.length > 0 ? (
-                  analytics.topCategories.map((category, index) => (
-                    <div key={category.name_en} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full">
-                          <span className="text-sm font-bold text-emerald-600">#{index + 1}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {locale === 'ka' ? category.name_ka : category.name_en}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {category.count} {locale === 'ka' ? 'პროდუქტი' : 'items'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">
-                          {category.spending.toLocaleString()} ₾
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">
-                      {locale === 'ka' ? 'მონაცემები არ არის' : 'No data available'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
