@@ -41,8 +41,8 @@ body {
 
 /* Universal fix for navbar overlap - simple approach */
 main {
-  margin-top: 4.25rem; /* Push main content below fixed navbar (tiny gap) */
-  min-height: calc(100vh - 4.25rem);
+  margin-top: 4rem; /* Push main content below fixed navbar (no gap) */
+  min-height: calc(100vh - 4rem);
 }
 
 /* Ensure all containers respect viewport width */
