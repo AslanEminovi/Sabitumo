@@ -62,15 +62,12 @@ export function CategorySidebar({
 
       {/* All Categories Option */}
       <div className="p-4 pt-6">
-        <motion.button
+        <button
           onClick={() => onCategorySelect('')}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-300 flex items-center space-x-3 rounded-lg ${
+          className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 flex items-center space-x-3 rounded-lg ${
             selectedCategoryId === '' 
-              ? 'text-amber-700 bg-amber-50 border border-amber-200 shadow-md' 
-              : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 hover:shadow-md'
+              ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
+              : 'text-gray-700 bg-white hover:bg-emerald-50 border border-gray-200 hover:border-emerald-200'
           }`}
         >
           <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
@@ -83,28 +80,19 @@ export function CategorySidebar({
           <span>
             {locale === 'ka' ? 'ყველა კატეგორია' : 'All Categories'}
           </span>
-        </motion.button>
+        </button>
       </div>
 
       {/* Category List */}
       <div className="flex-1 px-4 pb-6 space-y-2 overflow-y-auto">
-        {categories.map((category, index) => (
-          <motion.button
+        {categories.map((category) => (
+          <button
             key={category.id}
             onClick={() => onCategorySelect(category.id)}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ 
-              duration: 0.4, 
-              delay: 0.05 * index,
-              ease: "easeOut" 
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-300 flex items-center space-x-3 rounded-lg ${
+            className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 flex items-center space-x-3 rounded-lg ${
               selectedCategoryId === category.id 
-                ? 'text-amber-700 bg-amber-50 border border-amber-200 shadow-md' 
-                : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 hover:shadow-md'
+                ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' 
+                : 'text-gray-700 bg-white hover:bg-emerald-50 border border-gray-200 hover:border-emerald-200'
             }`}
           >
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
@@ -117,7 +105,7 @@ export function CategorySidebar({
             <span className="truncate">
               {locale === 'ka' ? category.name_ka : category.name_en}
             </span>
-          </motion.button>
+          </button>
         ))}
       </div>
 

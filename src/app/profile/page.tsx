@@ -223,7 +223,7 @@ export default function ProfilePage() {
         .sort((a, b) => b.spending - a.spending)
         .slice(0, 5)
 
-      // Calculate monthly trends for the last 12 months
+      // Calculate monthly trends for the last 12 months in chronological order
       const monthlyTrends = []
       for (let i = 11; i >= 0; i--) {
         const month = new Date(now.getFullYear(), now.getMonth() - i, 1)
@@ -241,9 +241,13 @@ export default function ProfilePage() {
         monthlyTrends.push({
           month: month.toLocaleDateString(locale, { month: 'short', year: 'numeric' }),
           spending,
-          orders: orderCount
+          orders: orderCount,
+          date: month // Add date for proper sorting
         })
       }
+
+      // Ensure chronological order (oldest to newest)
+      monthlyTrends.sort((a, b) => a.date.getTime() - b.date.getTime())
 
       // Generate recent activity
       const recentActivity: Array<{
@@ -451,7 +455,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         {/* Tab Navigation */}
         <div className="mb-8">
           <div className="border-b border-gray-200">

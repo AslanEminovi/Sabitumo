@@ -75,8 +75,10 @@ const nextConfig: NextConfig = {
     }
 
     // Tree shaking for better performance
-    config.optimization.usedExports = true
-    config.optimization.sideEffects = false
+    if (!dev) {
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
+    }
 
     return config
   },

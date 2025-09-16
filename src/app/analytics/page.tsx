@@ -277,6 +277,7 @@ export default function UserAnalyticsPage() {
                           selectedPeriod === '1year' ? 12 : 12
 
       const monthlyTrends = []
+      // Generate months in chronological order (oldest to newest)
       for (let i = monthsToShow - 1; i >= 0; i--) {
         const month = new Date(now.getFullYear(), now.getMonth() - i, 1)
         const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0)
@@ -293,12 +294,13 @@ export default function UserAnalyticsPage() {
         monthlyTrends.push({
           month: getMonthName(month.getMonth()),
           spending,
-          orders: orderCount
+          orders: orderCount,
+          date: month // Add date for proper sorting
         })
       }
 
-      // Sort months in chronological order (oldest to newest)
-      monthlyTrends.reverse()
+      // Ensure chronological order (oldest to newest)
+      monthlyTrends.sort((a, b) => a.date.getTime() - b.date.getTime())
 
       // Generate recent activity
       const recentActivity: Array<{
@@ -412,7 +414,7 @@ export default function UserAnalyticsPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         {/* Time Period Selector */}
         <TimePeriodSelector
           selectedPeriod={selectedPeriod}
