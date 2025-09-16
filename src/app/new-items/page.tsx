@@ -94,6 +94,7 @@ export default function NewItemsPage() {
   }
 
   const handleAddToCart = (product: Product) => {
+    const minQuantity = product.min_order_quantity || 1
     addItem({
       id: product.id,
       name_en: product.name_en,
@@ -102,7 +103,8 @@ export default function NewItemsPage() {
       currency: product.currency,
       image: product.images?.[0] || '/sabitumo1.png',
       stock: product.stock,
-      min_order_quantity: product.min_order_quantity || 1,
+      min_order_quantity: product.min_order_quantity,
+      quantity: minQuantity, // Explicitly pass minimum quantity
       selectedSize: ''
     })
   }

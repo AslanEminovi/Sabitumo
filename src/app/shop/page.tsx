@@ -67,6 +67,7 @@ function ShopPageContent() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [productsPerPage] = useState(12)
+  const [addedToCart, setAddedToCart] = useState<{ [key: string]: boolean }>({})
   const [currentImageIndex, setCurrentImageIndex] = useState<{[key: string]: number}>({})
 
   useEffect(() => {
@@ -734,6 +735,7 @@ function ShopPageContent() {
                         onClick={(e) => {
                           e.stopPropagation()
                           if (product.stock > 0) {
+                            const minQuantity = product.min_order_quantity || 1
                             addItem({
                               id: product.id,
                               name_en: product.name_en,
@@ -742,24 +744,46 @@ function ShopPageContent() {
                               currency: product.currency,
                               image: product.images?.[0],
                               stock: product.stock,
-                              min_order_quantity: product.min_order_quantity || 1,
+                              min_order_quantity: product.min_order_quantity,
+                              quantity: minQuantity, // Explicitly pass minimum quantity
                               selectedSize: '' // No size selected from shop page - goes to product page for size selection
                             })
+                            
+                            // Show added to cart animation
+                            setAddedToCart(prev => ({ ...prev, [product.id]: true }))
+                            setTimeout(() => {
+                              setAddedToCart(prev => ({ ...prev, [product.id]: false }))
+                            }, 2000)
                           }
                         }}
                         className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-150 flex items-center justify-center space-x-2 sm:space-x-3 font-semibold text-sm touch-manipulation transform ${
                           product.stock > 0
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
+                            ? addedToCart[product.id]
+                              ? 'bg-green-600 text-white shadow-lg'
+                              : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
                             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        <ShoppingCart className="w-5 h-5" />
-                        <span>
-                          {product.stock > 0
-                            ? (locale === 'ka' ? 'კალათაში დამატება' : 'Add to Cart')
-                            : (locale === 'ka' ? 'გაყიდულია' : 'Out of Stock')
-                          }
-                        </span>
+                        {addedToCart[product.id] ? (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>
+                              {locale === 'ka' ? 'დამატებულია' : 'Added!'}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-5 h-5" />
+                            <span>
+                              {product.stock > 0
+                                ? (locale === 'ka' ? 'კალათაში დამატება' : 'Add to Cart')
+                                : (locale === 'ka' ? 'გაყიდულია' : 'Out of Stock')
+                              }
+                            </span>
+                          </>
+                        )}
                       </button>
                     </div>
                 </motion.div>

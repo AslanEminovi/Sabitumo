@@ -43,6 +43,7 @@ export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState<{[key: string]: number}>({})
+  const [addedToCart, setAddedToCart] = useState<{ [key: string]: boolean }>({})
 
   useEffect(() => {
     fetchFeaturedProducts()
@@ -121,6 +122,7 @@ export default function HomePage() {
 
   const handleAddToCart = (product: Product) => {
     if (product.stock > 0) {
+      const minQuantity = product.min_order_quantity || 1
       addItem({
         id: product.id,
         name_en: product.name_en,
@@ -129,9 +131,16 @@ export default function HomePage() {
         currency: product.currency,
         image: product.images?.[0],
         stock: product.stock,
-        min_order_quantity: product.min_order_quantity || 1,
+        min_order_quantity: product.min_order_quantity,
+        quantity: minQuantity, // Explicitly pass minimum quantity
         selectedSize: '' // No size selected from main page - goes to product page for size selection
       })
+      
+      // Show added to cart animation
+      setAddedToCart(prev => ({ ...prev, [product.id]: true }))
+      setTimeout(() => {
+        setAddedToCart(prev => ({ ...prev, [product.id]: false }))
+      }, 2000)
     }
   }
 
