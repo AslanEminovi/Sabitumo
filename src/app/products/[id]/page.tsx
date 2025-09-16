@@ -625,6 +625,13 @@ export default function ProductDetailPage() {
                       }
                     </p>
                   )}
+                  
+                  {/* Global Minimum Order Notice */}
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>{locale === 'ka' ? 'ინფორმაცია:' : 'Info:'}</strong> {locale === 'ka' ? 'მინიმალური შეკვეთის ღირებულება 200₾-ია' : 'Minimum order value is 200₾'}
+                    </p>
+                  </div>
                 </div>
               )}
 

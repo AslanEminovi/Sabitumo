@@ -9,7 +9,7 @@ import Link from 'next/link'
 
 export default function CartPage() {
   const { t, locale } = useTranslation()
-  const { state, removeItem, updateQuantity, clearCart } = useCart()
+  const { state, removeItem, updateQuantity, clearCart, isGlobalMinimumMet, getGlobalMinimumRemaining, getGlobalMinimum } = useCart()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
 
   const handleCheckout = async () => {
@@ -304,13 +304,31 @@ export default function CartPage() {
                   </div>
                 </div>
 
+                {/* Minimum Order Validation */}
+                {!isGlobalMinimumMet() && (
+                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-center space-x-2 text-amber-800 mb-2">
+                      <Package className="w-5 h-5" />
+                      <span className="font-semibold">
+                        {locale === 'ka' ? 'მინიმალური შეკვეთა' : 'Minimum Order'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-amber-700">
+                      {locale === 'ka' 
+                        ? `მინიმალური შეკვეთის ღირებულება ${getGlobalMinimum()}₾-ია. დაამატეთ კიდევ ${getGlobalMinimumRemaining().toFixed(2)}₾-ის ღირებულების პროდუქტი.`
+                        : `Minimum order value is ${getGlobalMinimum()}₾. Add ${getGlobalMinimumRemaining().toFixed(2)}₾ more to proceed.`
+                      }
+                    </p>
+                  </div>
+                )}
+
                 {/* Checkout Button */}
                 <button
                   onClick={handleCheckout}
-                  disabled={isCheckingOut}
+                  disabled={isCheckingOut || !isGlobalMinimumMet()}
                   className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg ${
-                    isCheckingOut
-                      ? 'bg-emerald-400 cursor-not-allowed'
+                    isCheckingOut || !isGlobalMinimumMet()
+                      ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-emerald-600 hover:bg-emerald-700 hover:shadow-xl'
                   } text-white`}
                 >

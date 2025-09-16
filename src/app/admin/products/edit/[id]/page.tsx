@@ -670,7 +670,7 @@ export default function EditProductPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {locale === 'ka' ? 'მინიმალური შეკვეთის რაოდენობა' : 'Minimum Order Quantity'}
-                    <span className="text-red-500">*</span>
+                    <span className="text-gray-400 text-sm ml-1">({locale === 'ka' ? 'არასავალდებულო' : 'Optional'})</span>
                   </label>
                   <input
                     type="number"
@@ -681,17 +681,22 @@ export default function EditProductPage() {
                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors ${
                       errors.min_order_quantity ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="1"
+                    placeholder={locale === 'ka' ? 'ცარიელი = არ არის მინიმუმი' : 'Leave empty for no minimum'}
                   />
                   {errors.min_order_quantity && (
                     <p className="mt-1 text-sm text-red-600">{errors.min_order_quantity}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
                     {locale === 'ka' 
-                      ? 'მინიმალური რაოდენობა, რომელიც უნდა შეუკვეთოს მომხმარებელმა' 
-                      : 'Minimum quantity that customers must order'
+                      ? 'ზოგიერთ პროდუქტს შეიძლება ჰქონდეს მინიმალური შეკვეთის რაოდენობა. ცარიელი ნიშნავს რომ არ არის მინიმუმი.' 
+                      : 'Some products may have minimum order quantities. Leave empty if no minimum required.'
                     }
                   </p>
+                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>{locale === 'ka' ? 'გლობალური მინიმუმი:' : 'Global Minimum:'}</strong> {locale === 'ka' ? '200₾ მინიმალური შეკვეთის ღირებულება ყველა შეკვეთისთვის' : '200₾ minimum order value applies to all orders'}
+                    </p>
+                  </div>
                 </div>
 
                 {/* SKU */}

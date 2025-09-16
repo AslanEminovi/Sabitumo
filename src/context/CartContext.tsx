@@ -11,7 +11,7 @@ interface CartItem {
   image?: string
   quantity: number
   stock: number
-  min_order_quantity: number
+  min_order_quantity?: number
   selectedSize?: string
   cartItemId: string // Unique ID for cart item (product + size combination)
 }
@@ -21,6 +21,9 @@ interface CartState {
   totalItems: number
   totalPrice: number
 }
+
+// Global minimum order amount (in GEL)
+const GLOBAL_MINIMUM_ORDER_AMOUNT = 200
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity' | 'cartItemId'> & { quantity?: number; selectedSize?: string } }
@@ -149,6 +152,10 @@ interface CartContextType {
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
+  // New helper functions for minimum order validation
+  isGlobalMinimumMet: () => boolean
+  getGlobalMinimumRemaining: () => number
+  getGlobalMinimum: () => number
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -200,13 +207,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'CLEAR_CART' })
   }
 
+  // Helper functions for minimum order validation
+  const isGlobalMinimumMet = () => {
+    return state.totalPrice >= GLOBAL_MINIMUM_ORDER_AMOUNT
+  }
+
+  const getGlobalMinimumRemaining = () => {
+    return Math.max(0, GLOBAL_MINIMUM_ORDER_AMOUNT - state.totalPrice)
+  }
+
+  const getGlobalMinimum = () => {
+    return GLOBAL_MINIMUM_ORDER_AMOUNT
+  }
+
   return (
     <CartContext.Provider value={{
       state,
       addItem,
       removeItem,
       updateQuantity,
-      clearCart
+      clearCart,
+      isGlobalMinimumMet,
+      getGlobalMinimumRemaining,
+      getGlobalMinimum
     }}>
       {children}
     </CartContext.Provider>

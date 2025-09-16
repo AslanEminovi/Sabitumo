@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     // Calculate total amount
     let total_amount = 0
     const processedItems = []
+    const GLOBAL_MINIMUM_ORDER_AMOUNT = 200 // Global minimum order amount in GEL
 
     for (const item of items) {
       const { data: product } = await supabase
@@ -47,6 +48,13 @@ export async function POST(request: NextRequest) {
         total_price: itemTotal,
         selected_size: item.selected_size
       })
+    }
+
+    // Validate global minimum order amount
+    if (total_amount < GLOBAL_MINIMUM_ORDER_AMOUNT) {
+      return NextResponse.json({ 
+        error: `Minimum order amount is ${GLOBAL_MINIMUM_ORDER_AMOUNT} GEL. Current total: ${total_amount} GEL` 
+      }, { status: 400 })
     }
 
     // Create order in database

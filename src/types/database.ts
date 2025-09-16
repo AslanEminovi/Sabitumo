@@ -14,7 +14,7 @@ export interface Product {
   is_active: boolean
   created_at: string
   updated_at: string
-  min_order_quantity: number
+  min_order_quantity?: number
   brand_id?: string
   tags?: string[]
   sku?: string
