@@ -387,10 +387,21 @@ export default function HomePage() {
                   <motion.div
                     key={product.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.05 * index }}
-                    whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.1 } }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: Math.min(0.02 * index, 0.3),
+                      ease: "easeOut"
+                    }}
+                    whileHover={{ 
+                      y: -4, 
+                      scale: 1.02, 
+                      transition: { 
+                        duration: 0.3, 
+                        ease: "easeOut" 
+                      } 
+                    }}
                     className="group bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-2xl border border-white/60 overflow-hidden hover:shadow-xl sm:hover:shadow-3xl hover:bg-white transition-all duration-100 hover:border-emerald-200/50 flex flex-col h-full"
                     style={{ 
                       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)' 
@@ -678,10 +689,21 @@ export default function HomePage() {
               ].map((brand, index) => (
                 <motion.div
                   key={brand.name}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.1 * index }}
-                  whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.1 } }}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: Math.min(0.03 * index, 0.4),
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ 
+                    scale: 1.03, 
+                    y: -2, 
+                    transition: { 
+                      duration: 0.3, 
+                      ease: "easeOut" 
+                    } 
+                  }}
                   className="group bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-100 border border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
                   style={{ 
                     boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' 

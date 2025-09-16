@@ -81,6 +81,11 @@ function ShopPageContent() {
     fetchCategories()
   }, [searchParams])
 
+  // Reset to first page when filters change for smooth transitions
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, searchQuery, sortBy])
+
   const fetchProducts = async () => {
     try {
       setLoading(true)
@@ -393,10 +398,16 @@ function ShopPageContent() {
               </div>
             </motion.div>
           ) : (
-            <div className={viewMode === 'grid' 
-              ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6'
-              : 'space-y-6'
-            }>
+            <motion.div 
+              key={`${selectedCategory}-${sortBy}-${currentPage}`} // Key changes when category/sort/page changes
+              className={viewMode === 'grid' 
+                ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6'
+                : 'space-y-6'
+              }
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
               <AnimatePresence mode="popLayout" initial={false}>
                 {currentProducts.map((product, index) => (
                   <motion.div
@@ -802,7 +813,7 @@ function ShopPageContent() {
                 </motion.div>
               ))}
               </AnimatePresence>
-            </div>
+            </motion.div>
           )}
 
           {/* Enhanced Pagination */}
