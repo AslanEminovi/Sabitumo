@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import Image from 'next/image';
 import { GoArrowUpRight } from 'react-icons/go';
 import './CardNav.css';
 
@@ -172,7 +173,7 @@ const CardNav: React.FC<CardNavProps> = ({
           </div>
 
           <div className="logo-container">
-            <img src={logo} alt={logoAlt} className="logo" />
+            <Image src={logo} alt={logoAlt} className="logo" width={120} height={40} />
           </div>
 
           <button

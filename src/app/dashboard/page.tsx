@@ -183,6 +183,9 @@ export default function DashboardPage() {
         })
       }
 
+      // Sort months in chronological order (oldest to newest)
+      monthlySpendingData.reverse()
+
       // Calculate top categories - real data only
       const categoryStats: { [key: string]: { spending: number, orders: number } } = {}
       

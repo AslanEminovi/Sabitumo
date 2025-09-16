@@ -7,15 +7,78 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Performance optimizations
+  // Advanced performance optimizations
   experimental: {
     optimizeCss: true,
     scrollRestoration: true,
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+
+  // Bundle optimization
+  webpack: (config, { isServer, dev }) => {
+    // Client-side optimizations
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
+    // Optimize bundle size
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: -10,
+          },
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: 'react',
+            chunks: 'all',
+            priority: 20,
+          },
+          framer: {
+            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            name: 'framer',
+            chunks: 'all',
+            priority: 15,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            priority: -20,
+            enforce: true,
+          },
+        },
+      },
+    }
+
+    // Tree shaking for better performance
+    config.optimization.usedExports = true
+    config.optimization.sideEffects = false
+
+    return config
   },
   
   // Server external packages
@@ -101,56 +164,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
     ]
-  },
-  
-  // Webpack optimizations
-  webpack: (config, { isServer, dev }) => {
-    // Client-side optimizations
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    
-    // Production optimizations
-    if (!dev) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true,
-            },
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              priority: -10,
-              chunks: 'all',
-            },
-            react: {
-              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-              name: 'react',
-              chunks: 'all',
-              priority: 20,
-            },
-            framer: {
-              test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-              name: 'framer',
-              chunks: 'all',
-              priority: 15,
-            },
-          },
-        },
-      };
-    }
-    
-    return config;
   },
   
   // Output configuration for server hosting
