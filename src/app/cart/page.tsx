@@ -119,9 +119,9 @@ export default function CartPage() {
           </motion.div>
         ) : (
           /* Cart Items */
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* Cart Items List */}
-            <div className="xl:col-span-3">
+            <div className="xl:col-span-2">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

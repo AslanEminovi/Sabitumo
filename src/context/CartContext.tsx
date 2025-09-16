@@ -41,7 +41,9 @@ const initialState: CartState = {
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const quantityToAdd = action.payload.quantity || 1
+      // Respect minimum order quantity when adding items
+      const minOrderQuantity = action.payload.min_order_quantity || 1
+      const quantityToAdd = action.payload.quantity || minOrderQuantity
       const selectedSize = action.payload.selectedSize || ''
       
       // Create unique cart item ID based on product ID + size

@@ -88,6 +88,13 @@ export default function ProductDetailPage() {
     }
   }, [productId])
 
+  // Update quantity when product loads to respect minimum order quantity
+  useEffect(() => {
+    if (product?.min_order_quantity && product.min_order_quantity > 1) {
+      setQuantity(product.min_order_quantity)
+    }
+  }, [product?.min_order_quantity])
+
   const fetchProduct = async () => {
     try {
       setLoading(true)
