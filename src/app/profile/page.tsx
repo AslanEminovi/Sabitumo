@@ -455,7 +455,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
         {/* Tab Navigation */}
         <div className="mb-8">
           <div className="border-b border-gray-200">

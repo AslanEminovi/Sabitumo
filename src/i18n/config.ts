@@ -1,9 +1,9 @@
 export const i18nConfig = {
-  defaultLocale: 'en',
-  locales: ['en', 'ka'],
+  defaultLocale: 'ka',
+  locales: ['ka', 'en'],
   localeNames: {
-    en: 'English',
-    ka: 'ქართული'
+    ka: 'ქართული',
+    en: 'English'
   }
 } as const
 

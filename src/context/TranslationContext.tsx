@@ -31,8 +31,8 @@ interface TranslationProviderProps {
 }
 
 export function TranslationProvider({ children }: TranslationProviderProps) {
-  // Always start with Georgian to ensure consistent SSR
-  const [locale, setLocale] = useState<Locale>('ka')
+  // Always start with the default locale (Georgian) to ensure consistent SSR
+  const [locale, setLocale] = useState<Locale>(i18nConfig.defaultLocale as Locale)
 
   useEffect(() => {
     // Only change locale on client side after mount
